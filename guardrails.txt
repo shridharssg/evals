@@ -30,8 +30,8 @@ Answer   LLM fallback
 
 
 What Are Guardrails?
-Guardrails are safety mechanisms that validate and filter content at key points in your agent’s execution. In LangChain, they are implemented as middleware that intercepts execution at three levels:
 
+Guardrails are structured, rule‑based controls embedded within agentic AI systems to monitor inputs, limit behavior, and validate outputs. They serve as runtime checkpoints; filtering, sanitizing, or overriding when necessary to keep the content safe, aligned, and contextually appropriate.
 
 =========================================================
 PRODUCTION LEVEL GUARDRAILS FOR IKEA RAG ASSISTANT
@@ -612,5 +612,26 @@ def domain_guardrail(state):
 INTERVIEW ANSWER
 =================================================
 
-"We implemented a Domain Relevance Guardrail
-before retrieval. It validates whether a 
+
+
+workflow = StateGraph(state_schema=GraphStae)
+
+# Define the node
+workflow.add_node("input_guardrails", input_guardrails)
+workflow.add_node("output_guardrails", output_guardrails)
+
+# connect nodes via edges
+workflow.add_edge(START, "input_guardrails")
+workflow.add_conditional_edges(
+    "input_guardrails",
+    check_end_status,
+    {
+        "end": END,
+        "continue": "chat"
+    }
+)
+workflow.add_edge("chat", "output_guardrails")
+workflow.add_edge("output_guardrails", END)
+
+
+like this we can implement
