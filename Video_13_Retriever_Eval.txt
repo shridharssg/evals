@@ -1,0 +1,610 @@
+VIDEO 13 - RAG RETRIEVER EVALUATION
+PART 1: FOUNDATION AND RETRIEVER BUILDING
+============================================================
+
+1. SESSION GOAL
+- Continue the RAG Evaluation roadmap.
+- Build the Component Level Evaluation layer.
+- Focus on Retriever Evaluation before Generator Evaluation.
+- Learn how a Retriever is built, tested, improved, and measured.
+
+2. RAG EVALUATION ROADMAP
+
+Level 1: Component Evaluation
+  - Retriever Evaluation
+  - Generator Evaluation
+
+Level 2: Pipeline Evaluation
+  - RAG Triad
+  - Context Relevance
+  - Faithfulness
+  - Answer Relevance
+
+Level 3: Application Evaluation
+  - Correctness
+  - Completeness
+  - Safety
+  - Operational Metrics
+
+3. PROJECT STRUCTURE
+
+rag-eval-project/
+|
++-- data/
++-- src/
++-- evals/
++-- goldens/
+
+DATA
+- Stores transcript files.
+- Used as knowledge base.
+
+SRC
+- Retriever code
+- Generator code
+- RAG pipeline code
+
+EVALS
+- Evaluation scripts
+- DeepEval pipelines
+
+GOLDENS
+- Golden datasets
+- Questions and expected answers
+
+4. KNOWLEDGE BASE
+- Lecture transcripts become the source documents.
+- Timestamp lines are removed.
+- Only meaningful text is retained.
+- Session information is preserved as metadata.
+
+5. RETRIEVER ARCHITECTURE
+
+Question
+   |
+Embedding Model
+   |
+Vector Search
+   |
+Top-K Chunks
+   |
+Retrieved Context
+
+Responsibilities:
+- Load transcripts
+- Chunk content
+- Generate embeddings
+- Store embeddings in vector database
+- Retrieve relevant chunks
+
+6. RETRIEVER IMPLEMENTATION FLOW
+
+Step 1:
+Load transcript documents.
+
+Step 2:
+Remove timestamps.
+
+Step 3:
+Convert text into LangChain documents.
+
+Step 4:
+Apply chunking.
+
+Example Configuration:
+- Chunk Size = 750
+- Chunk Overlap = 100
+
+Step 5:
+Generate embeddings using OpenAI embeddings.
+
+Model Used:
+- text-embedding-3-small
+
+Step 6:
+Store vectors in ChromaDB.
+
+Step 7:
+Create Retriever object.
+
+Step 8:
+Retrieve Top-K chunks.
+
+Example:
+Question:
+What is Regression Testing?
+
+Retriever Output:
+Top 5 relevant chunks.
+
+7. IMPORTANT CONCEPT
+
+Building and Evaluation happen together.
+
+Bad Approach:
+Build entire application first.
+Evaluate later.
+
+Good Approach:
+Build Retriever.
+Evaluate Retriever.
+
+Build Generator.
+Evaluate Generator.
+
+Build Pipeline.
+Evaluate Pipeline.
+
+Build Application.
+Evaluate Application.
+
+
+====================
+
+PART 2: RETRIEVAL METRICS AND GOLDEN DATASETS
+============================================================
+
+1. RETRIEVER FAILURE MODES
+
+Failure Mode 1:
+Missing Relevant Context.
+
+Question requires:
+Chunk 1
+Chunk 15
+Chunk 13
+
+Retriever Returns:
+Chunk 27
+Chunk 28
+Chunk 29
+
+Result:
+Retriever failed completely.
+
+Failure Mode 2:
+Brings Correct Context with Noise.
+
+Required:
+1, 15, 13
+
+Returned:
+1, 15, 27, 28, 29
+
+Problem:
+Generator receives useful information plus noise.
+
+2. RECALL
+
+Definition:
+Out of all relevant chunks, how many were retrieved?
+
+Formula:
+Recall = Relevant Retrieved / Total Relevant
+
+Example:
+Relevant chunks = 5
+Retrieved correctly = 3
+
+Recall = 3/5
+
+3. PRECISION
+
+Definition:
+Out of all retrieved chunks, how many are actually useful?
+
+Formula:
+Precision = Useful Retrieved / Total Retrieved
+
+Example:
+Retrieved = 5
+Useful = 2
+
+Precision = 2/5
+
+4. PRECISION vs RECALL TRADEOFF
+
+Increasing K:
+
+Advantages:
+- Recall usually increases.
+
+Disadvantages:
+- Noise increases.
+- Precision may decrease.
+
+Therefore:
+Precision and Recall are always in tension.
+
+5. WHY THESE ARE REFERENCE-BASED EVALUATIONS
+
+To calculate Recall and Precision you must know:
+- What the correct retrieval should be.
+
+Therefore:
+Golden datasets are required.
+
+6. OLD APPROACH (NOT RECOMMENDED)
+
+Golden Dataset:
+
+Question
+Chunk IDs
+
+Example:
+What is Regression Testing?
+72, 89, 100
+
+Problem:
+If chunk size changes:
+- Chunk IDs change.
+- Dataset becomes invalid.
+- Expensive to recreate.
+
+This approach does not scale.
+
+7. NEW APPROACH (RECOMMENDED)
+
+Golden Dataset Structure:
+
+Question
+Ideal Answer
+
+Example:
+Question:
+What is Regression Testing?
+
+Ideal Answer:
+Human-reviewed answer based on transcripts.
+
+Important:
+Ideal answer comes from course content.
+Not from Google.
+
+Benefits:
+- Chunk changes do not matter.
+- Retriever strategy can evolve.
+- Dataset remains valid.
+
+8. CONTEXTUAL RECALL
+
+Process:
+
+Question
+  |
+Retriever
+  |
+Top-K Chunks
+  |
+LLM Judge
+
+LLM performs:
+
+Step 1:
+Break ideal answer into claims.
+
+Step 2:
+Check whether retrieved chunks contain those claims.
+
+Formula:
+Claims Found / Total Claims
+
+Example:
+3 claims
+3 found
+
+Recall = 1.0
+
+9. CONTEXTUAL PRECISION
+
+Question
+Ideal Answer
+Retrieved Chunk
+
+LLM Judge asks:
+
+Does this chunk help generate the ideal answer?
+
+YES -> Useful
+NO -> Noise
+
+Useful chunks measure Precision.
+
+10. RANK-AWARE PRECISION
+
+DeepEval uses ranking awareness.
+
+Relevant chunks appearing early are rewarded.
+
+Better:
+Relevant
+Relevant
+Noise
+Noise
+Noise
+
+Worse:
+Noise
+Noise
+Noise
+Relevant
+Relevant
+
+Same classical precision.
+Different contextual precision.
+
+DeepEval rewards better ranking.
+
+
+==================================
+
+
+VIDEO 13 - RAG RETRIEVER EVALUATION
+PART 3: DEEPEVAL, OPTIMIZATION AND RESULTS
+============================================================
+
+1. GOLDEN DATASET CREATION STRATEGIES
+
+Method 1: Human Authored
+
+Advantages:
+- Highest quality
+- Strongest supervision
+
+Disadvantages:
+- Slow
+- Expensive
+- Not scalable
+
+Method 2: LLM Assisted Drafting
+
+Process:
+- Upload transcripts
+- Generate questions
+- Generate ideal answers
+- Human reviews everything
+
+Advantages:
+- Faster
+- Practical
+
+Method 3: DeepEval Synthesizer
+
+Process:
+- Feed chunks
+- Generate question-answer pairs
+
+Observation from session:
+- Quality was inconsistent.
+- Human review still required.
+
+Method 4: Production Logs
+
+Use:
+- Real user questions
+- Positive interactions
+- Thumbs-up responses
+
+Convert them into golden datasets.
+
+2. DEEPEVAL FUNDAMENTALS
+
+Three Core Concepts:
+
+A. LLMTestCase
+Represents one row from golden dataset.
+
+Contains:
+- Input Question
+- Expected Output
+- Retrieved Context
+
+B. Metric
+Examples:
+- Contextual Recall
+- Contextual Precision
+- Answer Relevance
+- Faithfulness
+
+Parameters:
+- Judge Model
+- Threshold
+- Include Reason
+
+C. Evaluate()
+Runs metrics against test cases.
+
+3. RETRIEVER EVALUATION PIPELINE
+
+Step 1:
+Load golden dataset.
+
+Step 2:
+For every question:
+- Call retriever.
+- Get retrieved chunks.
+
+Step 3:
+Create LLMTestCase.
+
+Step 4:
+Run:
+- Contextual Recall
+- Contextual Precision
+
+Step 5:
+Generate report.
+
+4. FIRST BASELINE RESULT
+
+Approximate Outcome:
+- Recall = 80
+- Precision = 80
+
+Pass:
+10 tests
+
+Fail:
+5 tests
+
+5. IMPROVEMENT EXPERIMENT 1
+
+Change Chunking:
+
+Old:
+- Chunk Size 750
+- Overlap 100
+
+New:
+- Chunk Size 1000
+- Overlap 150
+
+Results:
+Recall increased dramatically.
+Precision improved slightly.
+
+Approximate Outcome:
+Recall ~ 97
+Precision ~ 83
+
+6. IMPROVEMENT EXPERIMENT 2
+
+Add Reranker.
+
+Benefits:
+- Better ranking.
+- More relevant chunks on top.
+
+Result:
+Precision improved.
+Failed tests reduced.
+
+7. IMPROVEMENT EXPERIMENT 3
+
+Upgrade Embedding Model.
+
+From:
+text-embedding-3-small
+
+To:
+text-embedding-3-large
+
+Result:
+Recall improved further.
+
+8. FINAL OBSERVATIONS
+
+High Recall:
+95%+
+
+Good Precision:
+~85%
+
+Conclusion:
+Retriever quality became good enough to move forward.
+
+9. KEY TAKEAWAYS
+
+- Build then evaluate.
+- Measure Retriever before building Generator.
+- Recall measures coverage.
+- Precision measures usefulness.
+- Contextual Recall is better than Recall@K.
+- Contextual Precision is ranking-aware.
+- Use LLM-as-a-Judge.
+- Golden datasets are critical.
+- Improve with chunking.
+- Improve with rerankers.
+- Improve with better embeddings.
+
+10. INTERVIEW ANSWER
+
+How do you evaluate a Retriever?
+
+Answer:
+
+1. Build golden dataset.
+2. Retrieve Top-K chunks.
+3. Measure Contextual Recall.
+4. Measure Contextual Precision.
+5. Use DeepEval.
+6. Analyze failed test cases.
+7. Improve chunking strategy.
+8. Add rerankers.
+9. Tune embeddings.
+10. Re-run evaluation suite.
+
+This completes the Component-Level Retriever Evaluation process.
+
+
+--------------
+
+
+# eval_retriever.py
+from dotenv import load_dotenv
+
+from deepeval import evaluate
+from deepeval.test_case import LLMTestCase
+from deepeval.metrics import ContextualRecallMetric, ContextualPrecisionMetric
+
+from src.reranker import RerankingRetriever
+from evals.harness import load_goldens, summarize_by_metric, print_summary
+
+load_dotenv()
+
+GOLDEN_PATH = "goldens/retriever_goldens.json"
+JUDGE_MODEL = "gpt-4o-mini"   # NOTE: differs from the other evals (gpt-4o-mini)
+THRESHOLD = 0.7
+
+
+def run(retriever):
+    # 1. LOAD the golden set --- the fixed, human-authored truth
+    goldens = load_goldens(GOLDEN_PATH)
+
+    # 2. RUN THE INJECTED RETRIEVER on each question to fill retrieval_context,
+    #    then build one test case per golden.
+    test_cases = []
+    for g in goldens:
+        retrieved = retriever.invoke(g["query"])
+        retrieval_context = [doc.page_content for doc in retrieved]
+
+        test_cases.append(
+            LLMTestCase(
+                input=g["query"],
+                expected_output=g["ideal_answer"],
+                retrieval_context=retrieval_context,
+                actual_output="(generator not evaluated in this run)",
+            )
+        )
+
+    # 3. THE METRICS --- recall (did we miss?) and precision (ranked well?)
+    metrics = [
+        ContextualRecallMetric(threshold=THRESHOLD, model=JUDGE_MODEL, include_reason=True),
+        ContextualPrecisionMetric(threshold=THRESHOLD, model=JUDGE_MODEL, include_reason=True),
+    ]
+
+    # 4. EVALUATE --- every metric on every case, batched + parallel, printed report.
+    #    hyperparameters travel with the run so the report is tagged with the config.
+    result = evaluate(
+        test_cases=test_cases,
+        metrics=metrics,
+        hyperparameters={
+            "retriever": "reranker",          # vs "reranked" when you swap it in
+            "embedding_model": "text-embedding-3-large",
+            "chunk_size": 1000,
+            "chunk_overlap": 150,
+            "top_k": 3,
+            "judge_model": JUDGE_MODEL,
+            "golden_set": GOLDEN_PATH,
+        },
+    )
+    return summarize_by_metric(result)
+
+
+def run_local():
+    """Standalone convenience: build the retriever, then run."""
+    return run(RerankingRetriever())
+
+
+if __name__ == "__main__":
+    print_summary("retriever", run_local())

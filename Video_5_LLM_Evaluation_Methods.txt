@@ -1,0 +1,647 @@
+====================================================================
+VIDEO 5 - LLM EVALUATION METHODS
+
+====================================================================
+1. MAIN TOPIC OF THIS VIDEO
+====================================================================
+
+Topic:
+LLM Evaluation Methods
+
+Definition:
+
+An LLM Evaluation Method is the mechanism used to decide
+whether an LLM output is good or not.
+
+It is the actual procedure that takes an output and
+produces a judgement.
+
+Key Question:
+
+Who executes the evaluation pipeline?
+
+
+====================================================================
+2. THREE EVALUATION METHODS
+====================================================================
+
+Every evaluation pipeline is generally executed by one of:
+
+1. Programmatic / Deterministic Method
+2. Human Method
+3. Model-Graded (LLM-Graded) Method
+
+In simple terms:
+
+Evaluation is performed by either:
+
+• A Program
+• A Human
+• An LLM
+
+
+####################################################################
+METHOD 1: PROGRAMMATIC EVALUATION
+####################################################################
+
+====================================================================
+3. EXAMPLE - EVALUATING A RAG RETRIEVER
+====================================================================
+
+Scenario:
+
+CampusX builds a RAG chatbot.
+
+Goal:
+
+Evaluate whether the Retriever is retrieving the correct documents.
+
+
+====================================================================
+4. TASK AND TARGET
+====================================================================
+
+Target:
+Retriever Component
+
+Task:
+Check whether relevant documents are being retrieved.
+
+
+====================================================================
+5. SUCCESS CRITERION
+====================================================================
+
+Metric Used:
+
+Recall@K
+
+Definition:
+
+Out of all correct documents available,
+how many were retrieved within the top-K results?
+
+
+Example:
+
+Question:
+What are the prerequisites for the ML course
+and how long is it?
+
+Correct Documents:
+
+1001
+1003
+
+Retriever Output (K=5):
+
+1001
+1002
+1004
+1005
+1006
+
+Recall Calculation:
+
+Relevant Retrieved = 1
+Total Relevant = 2
+
+Recall = 1/2 = 50%
+
+
+====================================================================
+6. BUILDING THE GOLDEN DATASET
+====================================================================
+
+Dataset Structure:
+
+Question --> Relevant Documents
+
+Process:
+
+• Create 50-100 realistic user questions.
+• Include easy questions.
+• Include difficult questions.
+• Include edge cases.
+
+Human experts identify which documents contain the correct answers.
+
+
+====================================================================
+7. PROGRAMMATIC EVALUATION PROCESS
+====================================================================
+
+Step 1:
+Send each question to the Retriever.
+
+Step 2:
+Collect Top-K retrieved documents.
+
+Step 3:
+Compare retrieved documents with Golden Dataset references.
+
+Step 4:
+Compute Recall for every question.
+
+Step 5:
+Average all recalls.
+
+Result:
+
+Overall Recall@K Score.
+
+Example:
+
+Recall@K = 67%
+
+
+====================================================================
+8. HOW TO IMPROVE RETRIEVER PERFORMANCE
+====================================================================
+
+Possible Improvements:
+
+• Better Embedding Model
+• Query Expansion
+• Increase K value
+• Add Reranking
+
+Goal:
+
+Increase retrieval accuracy and Recall.
+
+
+####################################################################
+METHOD 2: HUMAN EVALUATION
+####################################################################
+
+====================================================================
+9. EXAMPLE - CHATBOT HELPFULNESS
+====================================================================
+
+Scenario:
+
+CampusX has a general chatbot.
+
+Users may ask:
+
+• Course duration
+• Fees
+• Refund policies
+• Course suitability
+
+Goal:
+
+Evaluate Helpfulness.
+
+
+====================================================================
+10. TASK AND TARGET
+====================================================================
+
+Target:
+Entire Application
+
+Task:
+Measure Answer Helpfulness.
+
+
+====================================================================
+11. HELPFULNESS RUBRIC
+====================================================================
+
+Helpful means:
+
+• Accurate Answer
+• Correct Tone
+• Complete Response
+
+Scoring Scale:
+
+5 = Highly Helpful
+3 = Partially Helpful
+1 = Not Helpful
+
+
+====================================================================
+12. GOLDEN DATASET
+====================================================================
+
+Dataset contains only questions.
+
+Examples:
+
+• How long is the ML course?
+• Is the ML course useful if I already know Python?
+• What is the fee for the DL course?
+• Can I pay in installments?
+
+50-100 representative questions are collected.
+
+
+====================================================================
+13. WHY HUMAN EVALUATION IS NEEDED
+====================================================================
+
+Question:
+
+Can a program automatically determine whether a long answer is helpful?
+
+Answer:
+
+Usually no.
+
+Human judgement is needed because helpfulness is subjective and nuanced.
+
+
+====================================================================
+14. HUMAN GRADING PROCESS
+====================================================================
+
+Step 1:
+Question sent to chatbot.
+
+Step 2:
+Chatbot generates an answer.
+
+Step 3:
+Human reviewer evaluates answer.
+
+Step 4:
+Human assigns score using rubric.
+
+Step 5:
+Repeat for entire dataset.
+
+Step 6:
+Average scores to obtain overall helpfulness score.
+
+
+====================================================================
+15. MULTIPLE GRADERS
+====================================================================
+
+Sometimes more than one human grader is used.
+
+Benefits:
+
+• Detect ambiguity in rubric.
+• Increase confidence.
+• Identify inconsistent grading.
+
+If graders frequently disagree,
+then the rubric itself may be unclear.
+
+
+====================================================================
+16. OTHER HUMAN EVALUATION TECHNIQUES
+====================================================================
+
+A. Direct Grading and Rating
+
+Humans score outputs directly.
+
+
+B. Red Teaming
+
+Humans intentionally try to break the system.
+
+Goal:
+
+Find vulnerabilities before deployment.
+
+
+C. A/B Testing
+
+Users compare two chatbot versions.
+
+Higher-rated version is selected.
+
+
+D. Golden Dataset Creation
+
+Humans create:
+
+• Questions
+• Answers
+• Labels
+• Rubrics
+
+
+E. Human-in-the-Loop
+
+Humans review difficult cases that cannot be
+reliably handled automatically.
+
+
+====================================================================
+17. HUMAN EVALUATION
+ADVANTAGES AND DISADVANTAGES
+====================================================================
+
+Advantage:
+
+• Highly reliable judgement.
+
+Disadvantage:
+
+• Expensive
+• Difficult to scale
+
+Because humans are costly,
+large-scale systems cannot depend entirely on them.
+
+
+####################################################################
+METHOD 3: MODEL-GRADED (LLM-AS-A-JUDGE)
+####################################################################
+
+====================================================================
+18. MOTIVATION
+====================================================================
+
+Programmatic Methods:
+
+• Cheap
+• Scalable
+
+But not suitable for subjective tasks.
+
+Human Methods:
+
+• Reliable
+
+But expensive.
+
+Need:
+
+A middle ground.
+
+Solution:
+
+Use an LLM as the evaluator.
+
+This approach is called:
+
+LLM-as-a-Judge
+
+
+====================================================================
+19. UPSC EVALUATION PLATFORM EXAMPLE
+====================================================================
+
+Scenario:
+
+A platform conducts UPSC Mains mock tests.
+
+Problem:
+
+UPSC Mains answers are subjective.
+
+Traditional Approach:
+
+Human experts evaluate answers.
+
+Challenge:
+
+Thousands of students can submit answers.
+
+Human evaluation becomes expensive.
+
+Goal:
+
+Build an LLM-based evaluator that grades answers similarly to human experts.
+
+
+====================================================================
+20. SUCCESS CRITERION
+====================================================================
+
+The system is successful if:
+
+The LLM evaluates answers in a way that closely matches human evaluators.
+
+
+====================================================================
+21. BUILDING THE RUBRIC
+====================================================================
+
+Example Question:
+
+Ethical governance is impossible without
+administrative accountability. Discuss.
+
+Human experts define evaluation dimensions.
+
+Example Dimensions:
+
+• Defines ethical governance
+• Defines accountability
+• Explains relationship
+• Provides mechanisms
+• Gives examples
+• Includes balanced conclusion
+
+This becomes the rubric.
+
+
+====================================================================
+22. BUILDING THE GOLDEN DATASET
+====================================================================
+
+For each answer:
+
+Store:
+
+• Question ID
+• Student Answer
+• Human Score
+
+Human experts evaluate answers first.
+
+These become reference evaluations.
+
+
+====================================================================
+23. LLM-AS-A-JUDGE PROCESS
+====================================================================
+
+The LLM receives:
+
+• Question
+• Marks
+• Rubric
+• Student Answer
+
+Instructions:
+
+1. Evaluate each rubric dimension.
+2. Assign marks.
+3. Give reasoning.
+
+Output:
+
+LLM Score
+
+
+====================================================================
+24. COMPARING HUMAN VS LLM
+====================================================================
+
+For every answer:
+
+Human Score
+vs
+LLM Score
+
+Goal:
+
+Make them as similar as possible.
+
+
+====================================================================
+25. EVALUATION METRIC
+====================================================================
+
+Metric Suggested:
+
+MAE (Mean Absolute Error)
+
+Formula:
+
+Average Absolute Difference
+between Human Score and LLM Score.
+
+Example:
+
+Human = 13
+LLM = 12
+
+Human = 4
+LLM = 8
+
+Human = 8
+LLM = 8
+
+Compute average error.
+
+Example Result:
+
+MAE = 2.3
+
+Meaning:
+
+On average, the LLM differs from
+human evaluation by 2.3 marks.
+
+Goal:
+
+Push MAE toward 0.
+
+
+====================================================================
+26. IMPROVEMENT STRATEGIES
+====================================================================
+
+To reduce MAE:
+
+• Use a better model.
+• Improve system prompts.
+• Improve rubrics.
+• Refine evaluation instructions.
+
+
+====================================================================
+27. REFERENCE-BASED VS REFERENCE-FREE
+====================================================================
+
+Reference-Based Evaluation
+--------------------------
+
+Definition:
+
+Correct answer is known in advance.
+
+Evaluation compares system output against a predefined reference.
+
+Examples:
+
+• Retriever Evaluation
+• UPSC Grading Example
+
+Because the correct answer already exists inside the Golden Dataset.
+
+
+Reference-Free Evaluation
+-------------------------
+
+Definition:
+
+No predefined correct answer exists.
+
+Evaluation relies on judgement using criteria or rubrics.
+
+Example:
+
+Chatbot Helpfulness Evaluation.
+
+Humans assess quality directly without a predefined answer.
+
+
+====================================================================
+28. IDENTIFICATION RULE
+====================================================================
+
+Ask one question:
+
+Does the Golden Dataset already contain a correct answer?
+
+If YES:
+
+Reference-Based Evaluation
+
+If NO:
+
+Reference-Free Evaluation
+
+
+====================================================================
+29. KEY TAKEAWAYS
+====================================================================
+
+Three Evaluation Methods:
+
+1. Programmatic
+2. Human
+3. Model-Graded (LLM-as-a-Judge)
+
+Programmatic:
+
+• Cheap
+• Fast
+• Scalable
+
+Human:
+
+• Reliable
+• Expensive
+
+LLM-as-a-Judge:
+
+• Scalable
+• Flexible
+• Most common in modern LLM Evaluations
+
+Additional Concepts:
+
+• Recall@K
+• Human Grading
+• Rubrics
+• Golden Datasets
+• Mean Absolute Error (MAE)
+• Reference-Based Evaluation
+• Reference-Free Evaluation
+
+====================================================================
+END OF VIDEO 5 NOTES
+====================================================================

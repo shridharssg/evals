@@ -1,0 +1,419 @@
+====================================================================
+LLM EVALUATIONS - VIDEO 2
+WHAT ARE LLM EVALUATIONS?
+====================================================================
+1. DEFINITION OF LLM EVALUATIONS
+====================================================================
+
+LLM Evaluations are:
+
+Systematic, repeatable tests used to judge an LLM or an
+LLM-powered system against clearly defined criteria.
+
+Three key characteristics:
+
+1. Systematic
+2. Repeatable
+3. Based on clear criteria
+
+
+====================================================================
+2. CHARACTERISTICS OF LLM EVALUATIONS
+====================================================================
+
+--------------------------------------------------------------------
+A. SYSTEMATIC
+--------------------------------------------------------------------
+
+LLM Evaluations are not based on random testing.
+
+Instead:
+
+• Proper datasets are created.
+• Edge cases are included.
+• Real user behavior is analyzed.
+• The system is tested in a structured manner.
+
+Example:
+
+For a CampusX chatbot:
+
+• Collect real user conversations.
+• Build a dataset from those conversations.
+• Evaluate the chatbot against that dataset.
+
+
+--------------------------------------------------------------------
+B. REPEATABLE
+--------------------------------------------------------------------
+
+The same evaluation should work across multiple versions
+of the system.
+
+Examples of changes:
+
+• Prompt changes
+• Model changes
+• Retriever changes
+• Chunking changes
+
+The same test dataset should still be usable.
+
+Purpose:
+
+Compare Version 1 with Version 2.
+Measure whether the system is improving.
+
+
+--------------------------------------------------------------------
+C. CLEAR CRITERIA
+--------------------------------------------------------------------
+
+Every evaluation requires predefined quality criteria.
+
+Example criteria for a chatbot:
+
+• Correct answers
+• Simple explanations
+• Answers grounded in course material
+• Safe responses
+• No harmful or abusive content
+
+Without criteria:
+
+Vibe Testing.
+
+With criteria:
+
+Proper Evaluation.
+
+
+====================================================================
+3. LLM EVALUATIONS ARE NOT JUST METRICS
+====================================================================
+
+A common misconception is:
+
+Evaluation = Metric
+
+Examples from Machine Learning:
+
+• Accuracy
+• Precision
+• Recall
+
+In LLM systems this is incomplete.
+
+LLM Evaluation means the entire testing setup.
+
+The complete setup includes:
+
+• What is being evaluated
+• Evaluation criteria
+• Evaluation dataset
+• Offline or Online testing
+• Frameworks and tools used
+• Metrics used
+
+Example:
+
+For a RAG system:
+
+• Evaluate the retriever
+• Define metrics
+• Build datasets
+• Run tests
+• Analyze results
+
+All of this together forms LLM Evaluation.
+
+
+====================================================================
+4. QUESTIONS THAT LLM EVALUATIONS ANSWER
+====================================================================
+
+LLM Evaluations help answer practical questions such as:
+
+• Can this model perform a specific task?
+• Is the system production ready?
+• Is Prompt Version 2 better than Version 1?
+• Is the RAG answer grounded in retrieved context?
+• Is the agent completing the task correctly?
+• Is the chatbot safe for users?
+• Is latency under control?
+
+The goal is not only to generate a score.
+
+The goal is decision making.
+
+
+====================================================================
+5. TWO TYPES OF LLM EVALUATIONS
+====================================================================
+
+1. Model Evaluations
+2. Application Evaluations
+
+
+
+####################################################################
+# TYPE 1: MODEL EVALUATIONS
+####################################################################
+
+Definition:
+
+Model Evaluations evaluate the LLM itself.
+
+Purpose:
+
+Measure model capabilities.
+
+Examples:
+
+• How strong is the model?
+• How well can it reason?
+• How well can it code?
+
+
+====================================================================
+6. MAJOR MODEL CAPABILITIES THAT ARE TESTED
+====================================================================
+
+1. Reasoning
+
+Can the model solve problems step by step?
+
+
+2. Knowledge
+
+Does the model possess world knowledge?
+
+
+3. Mathematics
+
+Can the model solve mathematical problems?
+
+
+4. Coding
+
+Can the model write and understand code?
+
+
+5. Instruction Following
+
+Can it follow complex instructions correctly?
+
+
+6. Long Context Handling
+
+Can it understand and retrieve information from very
+large contexts?
+
+
+7. Multimodal Understanding
+
+Can it understand:
+
+• Text
+• Images
+• Audio
+
+
+8. Tool Usage
+
+Can it correctly use external tools?
+
+
+====================================================================
+7. MODEL EVALUATION BENCHMARKS
+====================================================================
+
+Examples discussed in the video:
+
+General Knowledge & Reasoning:
+
+• MMLU
+
+
+Mathematics:
+
+• GSM8K
+
+
+Coding:
+
+• SWE-Bench
+• HumanEval
+
+
+Instruction Following:
+
+• IFEval
+
+
+Long Context Evaluation:
+
+• Needle in a Haystack
+
+
+Multimodal Evaluation:
+
+• MMMU
+
+
+Purpose of Benchmarks:
+
+Evaluate and compare model capabilities.
+
+
+====================================================================
+8. WHY AI ENGINEERS SHOULD LEARN MODEL EVALUATIONS
+====================================================================
+
+Most AI Engineers will not create model benchmarks.
+
+Large research labs usually perform model evaluations.
+
+However, AI Engineers should know:
+
+• What benchmarks mean
+• How benchmark scores are interpreted
+• How model strengths differ
+
+This knowledge helps choose:
+
+• OpenAI models
+• Anthropic models
+• Open-source models
+
+for specific projects.
+
+
+####################################################################
+# TYPE 2: APPLICATION EVALUATIONS
+####################################################################
+
+Definition:
+
+Application Evaluations evaluate complete LLM-powered systems.
+
+This is the primary focus of the playlist.
+
+
+====================================================================
+9. WHY APPLICATION EVALUATIONS ARE IMPORTANT
+====================================================================
+
+An LLM is only one component of an AI application.
+
+Real-world AI applications also contain:
+
+• User Interface
+• System Prompts
+• Tools
+• APIs
+• Workflow Orchestration
+• Guardrails
+• Output Parsers
+• Memory Systems
+• Context Management
+• Retrieval Systems
+• Embedding Models
+• Vector Databases
+• Monitoring Systems
+• Feedback Loops
+
+A strong model alone does not guarantee
+a good application.
+
+
+====================================================================
+10. SMARTPHONE ANALOGY
+====================================================================
+
+A powerful processor does not automatically create
+an excellent smartphone.
+
+Other components matter:
+
+• Camera
+• Battery
+• Operating System
+• Audio System
+• Graphics
+
+Similarly:
+
+A strong LLM alone does not guarantee
+a strong AI application.
+
+The entire system must be evaluated.
+
+
+====================================================================
+11. WHAT APPLICATION EVALUATIONS MEASURE
+====================================================================
+
+Application Evaluations measure:
+
+• Entire systems
+• Individual components
+
+Examples:
+
+RAG Chatbot:
+
+• Retriever Quality
+• Embedding Quality
+• Reranker Quality
+• Final Answer Quality
+• Latency
+• Cost
+
+
+====================================================================
+12. QUESTIONS APPLICATION EVALUATIONS ANSWER
+====================================================================
+
+Examples from the video:
+
+• Was the student's question answered correctly?
+• Was the course material used properly?
+• Was the answer faithful to the source?
+• Was the answer beginner-friendly?
+• Was there hallucination?
+• Was the response fast enough?
+• Is the chatbot safe?
+
+
+====================================================================
+13. MAIN TAKEAWAYS FROM VIDEO 2
+====================================================================
+
+1. LLM Evaluations are systematic, repeatable tests.
+
+2. Evaluations require clear criteria.
+
+3. LLM Evaluation is more than metrics.
+
+4. Evaluations exist to support decisions.
+
+5. Two evaluation categories exist:
+   • Model Evaluations
+   • Application Evaluations
+
+6. Model Evaluations measure model capabilities.
+
+7. Application Evaluations measure complete systems.
+
+8. AI Engineers primarily work with Application Evaluations.
+
+9. Understanding model benchmarks helps with model selection.
+
+10. Most practical work in industry revolves around
+    evaluating LLM-powered applications rather than
+    benchmarking foundation models.
+
+====================================================================
+END OF VIDEO 2 NOTES
+====================================================================

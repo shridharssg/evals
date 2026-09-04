@@ -1,0 +1,545 @@
+EVALS VIDEO 17 - OPERATIONAL EVALUATIONS FOR RAG APPLICATIONS
+=================================================================
+
+check caching - promot caching and any other
+
+
+--
+https://github.com/campusx-official/rag-eval-deepeval/tree/main/evals
+
+TOPIC
+-----------------------------------------------------------------
+Operational Evaluations (Ops Evals) for RAG Applications.
+
+Context in Overall Evaluation Suite
+-----------------------------------------------------------------
+1. Component-Level Evaluations
+2. Pipeline-Level Evaluations
+3. Application-Level Evaluations
+
+Application-Level:
+- Quality (Completed)
+- Safety (Completed)
+- Operations (This Session)
+
+
+WHAT ARE OPERATIONAL EVALUATIONS?
+=================================================================
+
+Definition
+-----------------------------------------------------------------
+Operational evaluations answer a different question than quality
+metrics such as:
+
+- Correctness
+- Faithfulness
+- Relevance
+- Completeness
+
+Quality metrics measure answer quality.
+
+Operational evaluations measure whether the system can run:
+
+- Reliably
+- Quickly
+- Economically
+
+in production.
+
+
+Key Difference from Previous Evals
+-----------------------------------------------------------------
+Operational evaluations generally:
+
+- Do NOT require golden datasets
+- Do NOT require LLM-as-a-Judge
+
+They are primarily software and telemetry driven.
+
+
+MAIN OPERATIONAL METRICS
+=================================================================
+
+1. Latency
+-----------------------------------------------------------------
+Measures how long users wait for answers.
+
+
+2. Cost
+-----------------------------------------------------------------
+Measures money spent per query.
+
+
+3. Reliability
+-----------------------------------------------------------------
+Measures whether requests are successfully completed.
+
+
+(Throughput exists as another metric but was not covered in detail.)
+
+
+WHY INCLUDE OPERATIONAL EVALS BEFORE DEPLOYMENT?
+=================================================================
+
+Reason
+-----------------------------------------------------------------
+Even though operational metrics are most useful in production,
+measuring them before deployment helps detect regressions.
+
+Example Discussed
+-----------------------------------------------------------------
+Original System:
+
+- Correctness = 91%
+- Faithfulness = 94%
+- Answer Relevance = 93%
+
+Operational Metrics:
+
+- Avg Latency = 2.3 sec
+- P95 Latency = 4.8 sec
+- Cost/query = 72 paise
+
+
+After Improvements
+-----------------------------------------------------------------
+Changes:
+
+- Added reranker
+- Increased retrieved chunks
+- Switched to larger model
+
+Quality improved:
+
+- Correctness = 95%
+- Faithfulness = 96%
+- Relevance = 95%
+
+But:
+
+- Latency increased
+- Cost increased
+
+Operational evaluations reveal these tradeoffs.
+
+
+LATENCY EVALUATION
+=================================================================
+
+Definition
+-----------------------------------------------------------------
+Latency = Time taken by the system to respond to a request.
+
+Example:
+
+User sends question
+        ↓
+Answer appears
+
+Time difference = Latency
+
+
+Basic Measurement
+-----------------------------------------------------------------
+Start timer before RAG execution.
+
+Stop timer after response is generated.
+
+Latency = End Time - Start Time
+
+
+Important Latency Considerations
+=================================================================
+
+1. Prefer Distributions over Averages
+-----------------------------------------------------------------
+Do not measure only average latency.
+
+Also track:
+
+- P50 Latency (Median)
+- P95 Latency
+- P99 Latency
+
+Reason:
+These reveal worst-user experiences.
+
+
+Definitions
+-----------------------------------------------------------------
+P50:
+50% of requests completed within this time.
+
+P95:
+95% of requests completed within this time.
+
+P99:
+99% of requests completed within this time.
+
+
+2. Measure End-to-End and Component Latency
+-----------------------------------------------------------------
+Example:
+
+Total Latency = 4.5 sec
+
+Breakdown:
+- Retrieval = 1.5 sec
+- Generation = 3 sec
+
+This helps identify bottlenecks.
+
+
+3. Measure TTFT
+-----------------------------------------------------------------
+TTFT = Time To First Token.
+
+Definition:
+Time taken before the first token appears.
+
+Reason:
+Streaming improves user experience.
+
+Important to measure separately from total latency.
+
+
+4. Watch for Cold Starts
+-----------------------------------------------------------------
+Cold Starts may occur due to:
+
+- Model loading
+- DB connections
+- Network initialization
+- Cache creation
+- Container startup
+
+Recommendation:
+Ignore initial warm-up runs.
+
+
+5. Track Context Size and Output Length
+-----------------------------------------------------------------
+Latency depends on:
+
+- Context size
+- Output token count
+
+Longer outputs generally increase latency.
+
+
+6. Distinguish Latency from Throughput
+-----------------------------------------------------------------
+Latency:
+Time for one request.
+
+Throughput:
+Number of requests handled in a given time.
+
+Example:
+
+Restaurant Example
+- Latency = Time customer waits for food.
+- Throughput = Customers served per hour.
+
+
+7. Repeat Runs
+-----------------------------------------------------------------
+External APIs introduce noise.
+
+Run the same tests multiple times and average results.
+
+
+8. Track Failures Separately
+-----------------------------------------------------------------
+Latency alone is not enough.
+
+Also track:
+
+- Timeout rate
+- Failed requests
+
+A lower latency with many failures is misleading.
+
+
+9. Set Latency Budgets
+-----------------------------------------------------------------
+Example:
+
+P95 Latency should never exceed 3 seconds.
+
+Budgets should exist at:
+
+- System level
+- Component level
+
+
+10. Use Representative Workloads
+-----------------------------------------------------------------
+Include:
+
+- Easy questions
+- Medium questions
+- Hard questions
+
+Evaluation should reflect real user behavior.
+
+
+LATENCY REPORT INTERPRETATION
+=================================================================
+
+Metrics Discussed
+-----------------------------------------------------------------
+1. End-to-End Latency
+2. Retrieval Latency
+3. Generation Latency
+4. TTFT (Time To First Token)
+5. Output Length
+6. SLO Compliance
+
+
+Latency Improvement Techniques
+=================================================================
+
+1. Use Faster Models
+2. Use Model Routing
+3. Generate Shorter Answers
+4. Reduce Context Size
+5. Use Context Compression
+6. Optimize Retrieval Pipeline
+7. Apply Caching
+   - Embedding Cache
+   - Retrieval Cache
+   - Reranking Cache
+   - Prompt Cache
+8. Improve Infrastructure Placement
+
+
+COST EVALUATION
+=================================================================
+
+Definition
+-----------------------------------------------------------------
+Cost = Money spent to process a query.
+
+Primary Contributor:
+LLM Token Usage.
+
+
+Major Cost Sources
+-----------------------------------------------------------------
+1. LLM API Calls
+2. Embedding Model
+3. Vector Database
+4. Reranking Service
+5. Infrastructure Hosting
+
+
+Core Cost Formula
+-----------------------------------------------------------------
+Input Tokens Cost
++
+Output Tokens Cost
+=
+Total LLM Cost
+
+
+Important Cost Considerations
+=================================================================
+
+1. Cost per Query
+-----------------------------------------------------------------
+Most important metric.
+
+
+2. Separate Input and Output Costs
+-----------------------------------------------------------------
+Analyze independently.
+
+
+3. Measure Cost Distribution
+-----------------------------------------------------------------
+Track:
+
+- Average Cost
+- P95 Cost
+
+to discover expensive outlier queries.
+
+
+4. Segment by Query Type
+-----------------------------------------------------------------
+Track costs for:
+
+- Simple queries
+- Moderate queries
+- Complex queries
+
+
+5. Define Cost Budgets
+-----------------------------------------------------------------
+Example:
+
+Maximum cost allowed per query.
+
+
+Cost Optimization Techniques
+=================================================================
+
+1. Reduce Context Size
+2. Improve Prompt Efficiency
+3. Produce Smaller Outputs
+4. Use Cheaper Models
+5. Use Caching
+
+Most powerful cost lever:
+Changing the model.
+
+
+RELIABILITY EVALUATION
+=================================================================
+
+Definition
+-----------------------------------------------------------------
+Reliability = Ability of the RAG system to successfully serve
+requests without:
+
+- Errors
+- Timeouts
+- Crashes
+- Broken pipeline stages
+
+
+Example
+-----------------------------------------------------------------
+10 requests sent.
+
+8 succeeded.
+2 failed.
+
+Reliability = 80%
+
+
+Reliability Metrics
+=================================================================
+
+1. Success Rate
+-----------------------------------------------------------------
+Percentage of successful requests.
+
+
+2. Error Rate
+-----------------------------------------------------------------
+Percentage of failed requests.
+
+Error Rate = 1 - Success Rate
+
+
+3. Timeout Rate
+-----------------------------------------------------------------
+Requests exceeding allowed time.
+
+
+4. Retry Rate
+-----------------------------------------------------------------
+Requests requiring retries.
+
+
+Important Reliability Considerations
+=================================================================
+
+1. Measure Success and Failure Rates
+
+2. Categorize Failures
+-----------------------------------------------------------------
+Examples:
+
+- LLM API failures
+- Retriever failures
+- Reranker failures
+- Timeout failures
+- Rate-limit failures
+- Parsing failures
+- Internal exceptions
+
+
+3. Measure Reliability Under Load
+-----------------------------------------------------------------
+Reliability may decrease with many concurrent users.
+
+
+4. Use Large Sample Sizes
+-----------------------------------------------------------------
+More requests reveal hidden failures.
+
+
+5. Use Representative Queries
+-----------------------------------------------------------------
+Include:
+
+- Easy queries
+- Long-context queries
+- Complex queries
+- Long-answer queries
+- Edge cases
+
+
+RELIABILITY REPORT
+=================================================================
+
+Metrics Produced
+-----------------------------------------------------------------
+- Success Rate
+- Error Rate
+- Retry Rate
+
+In the demonstrated setup:
+
+- Success Rate = 100%
+- Error Rate = 0%
+- Retry Rate = 0%
+
+Reason:
+A small offline test with a highly reliable API.
+
+
+KEY TAKEAWAYS
+=================================================================
+
+1. Operational evaluations measure production readiness.
+
+2. They do not require:
+   - Golden datasets
+   - LLM-as-a-Judge
+
+3. Three major operational metrics:
+   - Latency
+   - Cost
+   - Reliability
+
+4. Latency should be measured using:
+   - P50
+   - P95
+   - P99
+   - TTFT
+
+5. Cost should focus on:
+   - Cost/query
+   - Input vs Output cost
+   - Cost budgets
+
+6. Reliability should track:
+   - Success rate
+   - Error rate
+   - Timeout rate
+   - Retry rate
+
+7. Operational evaluations are useful both:
+   - Before deployment (regression detection)
+   - After deployment (production monitoring)
+
+8. The completed RAG Evaluation Suite now includes:
+   - Component Evaluations
+   - Pipeline Evaluations
+   - Application Quality Evaluations
+   - Application Safety Evaluations
+   - Operational Evaluations

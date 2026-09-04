@@ -1,0 +1,530 @@
+====================================================================
+LLM EVALUATION PLAYLIST - ENGLISH NOTES
+RAG EVALUATION FRAMEWORK (FORMATTED VERSION)
+====================================================================
+
+RECAP OF THE PLAYLIST
+
+--------------------------------------------------------------------
+1. FUNDAMENTALS OF LLM EVALUATION
+--------------------------------------------------------------------
+
+Topics Covered:
+
+• Why LLM evaluations are necessary
+• What LLM evaluations are
+• Reference-based evaluations
+• Reference-free evaluations
+• Online evaluations
+• Offline evaluations
+
+Two Major Categories:
+
+1. Model Evaluations
+2. Application Evaluations
+
+Our primary focus: Application Evaluations.
+
+
+--------------------------------------------------------------------
+2. MODEL EVALUATIONS
+--------------------------------------------------------------------
+
+A. Standardized Evaluations (Benchmarks)
+
+Used to measure:
+
+• Knowledge capability
+• Reasoning capability
+• General performance
+
+B. Custom Model Evaluations
+
+Used when selecting a model for a specific application.
+Organizations create their own datasets and run custom evaluations.
+
+
+====================================================================
+APPLICATION EVALUATIONS
+====================================================================
+
+Examples of LLM Applications:
+
+• Simple Chatbots
+• RAG Chatbots
+• AI Agents
+• Multimodal Applications
+• Fixed-Schema Output Applications
+
+Examples:
+
+Multimodal Apps:
+• Image generation
+• Audio generation
+• Video generation
+
+Fixed Schema Apps:
+• Email classification
+• Ticket routing
+• Structured information extraction
+
+
+====================================================================
+WHY FOCUS ON RAG AND AGENTS?
+====================================================================
+
+Most real-world enterprise GenAI applications use:
+
+• RAG (Retrieval Augmented Generation)
+• AI Agents
+
+If you understand how to evaluate these advanced systems,
+you can easily evaluate simpler chatbot applications.
+
+
+====================================================================
+PROJECT: CAMPUSX DOUBT SOLVER
+====================================================================
+
+Goal:
+
+Create a RAG chatbot using lecture transcripts.
+
+Workflow:
+
+Lecture Transcripts
+        |
+        v
+   Vector Database
+        |
+        v
+      Retriever
+        |
+        v
+      Generator
+        |
+        v
+     Final Answer
+
+Students can ask course-related questions and receive answers
+from the lecture transcripts.
+
+
+====================================================================
+THREE LEVELS OF EVALUATION
+====================================================================
+
+1. Component Level
+2. Pipeline Level
+3. Application/System Level
+
+
+####################################################################
+# LEVEL 1: COMPONENT EVALUATION
+####################################################################
+
+STEP 1: BUILD THE RETRIEVER
+
+Tasks:
+
+• Load documents
+• Perform chunking
+• Generate embeddings
+• Store vectors
+• Retrieve relevant chunks
+
+
+--------------------------------------------------------------------
+STEP 2: EVALUATE THE RETRIEVER
+--------------------------------------------------------------------
+
+Metrics:
+
+1. Recall
+
+Measures:
+"Out of all relevant documents, how many did the retriever retrieve?"
+
+2. Precision
+
+Measures:
+"Out of all retrieved documents, how many are actually useful?"
+
+
+--------------------------------------------------------------------
+STEP 3: BUILD THE GENERATOR
+--------------------------------------------------------------------
+
+Input:
+• Question
+• Context
+
+Output:
+• Answer
+
+
+--------------------------------------------------------------------
+STEP 4: EVALUATE THE GENERATOR
+--------------------------------------------------------------------
+
+Metrics:
+
+1. Faithfulness
+
+Checks whether the answer is generated strictly from
+provided context and not hallucinated.
+
+2. Relevance
+
+Checks whether the generated answer is relevant
+to the user's question.
+
+3. Citation Accuracy
+
+Checks whether references to documents,
+transcripts, or lecture sources are correct.
+
+
+####################################################################
+# LEVEL 2: PIPELINE EVALUATION
+####################################################################
+
+STEP 5: BUILD THE RAG PIPELINE
+
+Retriever + Generator
+
+
+--------------------------------------------------------------------
+STEP 6: EVALUATE THE RAG PIPELINE
+--------------------------------------------------------------------
+
+RAG TRIAD
+
+Three key metrics:
+
+1. Context Relevance
+
+Question <--> Context
+
+Checks:
+Did the retriever fetch the correct context?
+
+
+2. Faithfulness
+
+Answer <--> Context
+
+Checks:
+Was the answer generated from the context?
+
+
+3. Answer Relevance
+
+Question <--> Answer
+
+Checks:
+Did the answer actually answer the question?
+
+
+####################################################################
+# LEVEL 3: APPLICATION EVALUATION
+####################################################################
+
+APPLICATION QUALITY METRICS
+
+1. Correctness
+
+Checks whether the answer is factually correct.
+
+
+2. Completeness
+
+Checks whether all parts of the question were answered.
+
+
+3. Style
+
+Checks whether the chatbot's explanation style matches
+CampusX teaching style.
+
+
+--------------------------------------------------------------------
+SAFETY EVALUATION
+--------------------------------------------------------------------
+
+Metrics:
+
+• Toxicity
+• PII Leakage
+• Jailbreak Resistance
+
+
+--------------------------------------------------------------------
+OPERATIONAL EVALUATION
+--------------------------------------------------------------------
+
+Metrics:
+
+• Latency
+• Cost Per Query
+• Token Usage
+
+
+====================================================================
+EVALUATION SUITE (EVAL SUITE)
+====================================================================
+
+An Eval Suite is a collection of tests that evaluate:
+
+• Components
+• Pipelines
+• Applications
+• Safety
+• Operations
+
+All tests together give a complete picture of system quality.
+
+
+====================================================================
+DEEPEVAL LIBRARY
+====================================================================
+
+DeepEval provides built-in metrics such as:
+
+• Answer Relevancy
+• Faithfulness
+• Contextual Relevancy
+• Contextual Precision
+• Contextual Recall
+• Toxicity
+• PII Leakage
+
+Why DeepEval?
+
+• Industry adoption is growing rapidly
+• Supports RAG systems
+• Supports Agent evaluations
+• Supports Safety evaluations
+• Inspired by PyTest testing framework
+
+
+====================================================================
+REGRESSION TESTING
+====================================================================
+
+Purpose:
+
+Verify whether Version 2 is better than Version 1.
+
+
+Suggested Project Structure:
+
+Project
+|
++-- src
+|   +-- retriever.py
+|   +-- generator.py
+|   +-- rag_pipeline.py
+|
++-- evals
+|   +-- eval_retriever.py
+|   +-- eval_generator.py
+|   +-- eval_pipeline.py
+|   +-- eval_safety.py
+|   +-- eval_ops.py
+|
++-- run_evals.py
+
+
+Running:
+
+python run_evals.py
+
+This executes every evaluation and generates a report.
+
+
+====================================================================
+EXPERIMENT TRACKING
+====================================================================
+
+Popular Tools:
+
+• MLflow
+• Weights & Biases
+• Confident AI
+
+Example:
+
+Experiment 1
+------------
+Chunk Size = 500
+Overlap = 50
+Recall = 0.82
+Precision = 0.68
+
+Experiment 2
+------------
+Chunk Size = 700
+Overlap = 30
+Recall = 0.88
+Precision = 0.74
+
+Benefits:
+
+• Compare experiments visually
+• Track configuration changes
+• Identify best performing version
+
+
+====================================================================
+CI/CD AUTOMATION
+====================================================================
+
+Workflow:
+
+Code Change
+    |
+    v
+Run Eval Suite
+    |
+    v
+Compare With Baseline
+    |
+    v
+Pass?
+    |
+    +---- YES ---> Deploy
+    |
+    +---- NO ----> Block Deployment
+
+
+Benefits:
+
+• Automatic testing
+• Quality gates
+• Safer deployments
+
+
+====================================================================
+ONLINE EVALUATION AFTER DEPLOYMENT
+====================================================================
+
+Evaluation never stops after deployment.
+
+
+--------------------------------------------------------------------
+OBSERVABILITY
+--------------------------------------------------------------------
+
+Track:
+
+• Latency
+• Cost
+• Tokens
+• User Feedback (Thumbs Up / Thumbs Down)
+
+Tools:
+
+• LangSmith
+• Langfuse
+• Confident AI
+
+
+--------------------------------------------------------------------
+ONLINE QUALITY METRICS
+--------------------------------------------------------------------
+
+Monitor:
+
+• Faithfulness
+• Answer Relevance
+• Correctness
+
+on real production traffic.
+
+
+--------------------------------------------------------------------
+DRIFT DETECTION
+--------------------------------------------------------------------
+
+Identify whether performance degrades over time.
+
+Example:
+
+If faithfulness suddenly decreases over the last few hours,
+raise an alert and investigate.
+
+
+--------------------------------------------------------------------
+SELF-IMROVING FEEDBACK LOOP
+--------------------------------------------------------------------
+
+Bad production interactions are:
+
+1. Collected
+2. Added to evaluation datasets
+3. Used for future testing
+4. Used to improve the system
+
+
+====================================================================
+INTERVIEW ANSWER:
+HOW DO YOU EVALUATE A RAG CHATBOT?
+====================================================================
+
+1. Evaluate Components
+   • Retriever -> Precision, Recall
+   • Generator -> Faithfulness, Relevance
+
+2. Evaluate Pipeline
+   • Context Relevance
+   • Faithfulness
+   • Answer Relevance
+
+3. Evaluate Application
+   • Correctness
+   • Completeness
+   • Style
+   • Safety
+   • Operational Metrics
+
+4. Build an Eval Suite
+
+5. Run Regression Testing
+
+6. Deploy Only After Passing Evaluation Thresholds
+
+7. Run Online Evaluations After Deployment
+
+8. Add Real-World Failures Back Into Evaluation Datasets
+
+
+====================================================================
+FINAL TAKEAWAY
+====================================================================
+
+A professional answer focuses on the COMPLETE FRAMEWORK,
+not just a few metrics.
+
+Component Evaluation
+        |
+        v
+Pipeline Evaluation
+        |
+        v
+Application Evaluation
+        |
+        v
+Regression Testing
+        |
+        v
+Deployment
+        |
+        v
+Online Evaluation
+        |
+        v
+Continuous Improvement
+
+This is the complete RAG Evaluation Framework.
+====================================================================

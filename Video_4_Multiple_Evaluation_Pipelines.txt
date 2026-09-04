@@ -1,0 +1,483 @@
+====================================================================
+VIDEO 4 - LLM EVALUATIONS
+WHY ONE APPLICATION NEEDS MULTIPLE EVALUATION PIPELINES
+
+====================================================================
+1. RECAP OF PREVIOUS VIDEOS
+====================================================================
+
+Topics covered previously:
+
+1. Why LLM Evaluations are needed.
+2. What LLM Evaluations are.
+3. Types of Evaluations:
+   • Model Evaluations
+   • Application Evaluations
+4. Basic Evaluation Workflow.
+
+Key distinction:
+
+• Model Evaluations evaluate LLMs.
+• Application Evaluations evaluate LLM-powered systems.
+
+The course primarily focuses on Application Evaluations.
+
+
+====================================================================
+2. MAIN QUESTION OF THIS VIDEO
+====================================================================
+
+Why does a single LLM application require multiple
+Evaluation Pipelines?
+
+Why is one evaluation pipeline not enough?
+
+
+====================================================================
+3. EXAMPLE: RAG CHATBOT
+====================================================================
+
+Basic Architecture:
+
+User Query
+     |
+     v
+Retriever
+     |
+     v
+Vector Database
+     |
+     v
+Relevant Documents
+     |
+     v
+Generator (LLM)
+     |
+     v
+Answer
+
+
+====================================================================
+4. FIRST MAJOR REASON:
+MULTIPLE FAILURE POINTS
+====================================================================
+
+A single LLM application can fail at multiple locations.
+
+For a RAG system, two obvious failure points are:
+
+1. Retriever
+2. Generator
+
+
+--------------------------------------------------------------------
+A. RETRIEVER FAILURE
+--------------------------------------------------------------------
+
+Retriever Responsibility:
+
+Fetch relevant documents for a given query.
+
+Potential Failure:
+
+• Retrieves wrong documents.
+• Misses important documents.
+
+Result:
+
+Generator receives poor context and may produce
+wrong answers.
+
+
+--------------------------------------------------------------------
+B. GENERATOR FAILURE
+--------------------------------------------------------------------
+
+Generator Responsibility:
+
+Generate answers using retrieved context.
+
+Potential Failure:
+
+• Hallucination
+• Ignoring context
+• Producing unsupported information
+
+Result:
+
+Wrong final response.
+
+
+====================================================================
+5. COMPONENT-LEVEL EVALUATIONS
+====================================================================
+
+Because these components can fail independently,
+separate evaluation pipelines are required.
+
+Retriever Evaluation Pipeline
+-----------------------------
+
+Checks:
+
+• Are retrieved documents relevant?
+• Is the right context being fetched?
+
+
+Generator Evaluation Pipeline
+-----------------------------
+
+Checks:
+
+• Faithfulness
+• Groundedness
+
+Question:
+
+Is the generated answer based only on the supplied
+context?
+
+Example:
+
+Question:
+What is the duration of the Machine Learning course?
+
+Retrieved Context:
+Duration = 3 weeks
+
+Correct Answer:
+Duration = 3 weeks
+
+Wrong Behaviour:
+
+Adding unrelated facts that were never present in the
+retrieved documents.
+
+
+====================================================================
+6. WHY COMPONENT EVALUATIONS ARE NOT ENOUGH
+====================================================================
+
+Even if:
+
+• Retriever works correctly
+• Generator works correctly
+
+The complete RAG application may still fail.
+
+
+====================================================================
+7. EXAMPLE OF PIPELINE FAILURE
+====================================================================
+
+Question:
+
+What is the duration of the Machine Learning course?
+
+Retriever returns top 5 documents.
+
+Example:
+
+D1 = Unrelated
+D2 = Unrelated
+D3 = Unrelated
+D4 = Unrelated
+D5 = Correct document
+       (ML course duration = 8 weeks)
+
+Retriever technically succeeded because the correct
+information was included in the retrieved set.
+
+However:
+
+Generator gives higher importance to D1-D4.
+
+Suppose D1 contains:
+
+Python course duration = 6 weeks
+
+Generator combines information incorrectly and answers:
+
+"ML course duration is 6 weeks"
+
+Result:
+
+Retriever Evaluation = Passed
+Generator Evaluation = Passed
+Final Answer = Wrong
+
+
+====================================================================
+8. PIPELINE-LEVEL EVALUATIONS
+====================================================================
+
+This example shows a new type of failure.
+
+The failure is not inside:
+
+• Retriever alone
+• Generator alone
+
+The failure occurs in their interaction.
+
+Therefore:
+
+A Pipeline-Level Evaluation is required.
+
+Pipeline Evaluation checks:
+
+• How components work together.
+• Whether information flows correctly.
+• Whether the final answer is produced correctly.
+
+
+====================================================================
+9. RERANKER EXAMPLE
+====================================================================
+
+To solve the previous problem:
+
+A Reranker can be introduced.
+
+Purpose:
+
+Reorder retrieved documents.
+
+Instead of:
+
+D1 D2 D3 D4 D5(correct)
+
+The reranker may produce:
+
+D5(correct) D1 D2 D3 D4
+
+Now the generator receives the most relevant
+context first.
+
+Pipeline quality improves.
+
+
+====================================================================
+10. ARE PIPELINE EVALUATIONS ENOUGH?
+====================================================================
+
+No.
+
+Even when:
+
+• Component Evaluations pass
+• Pipeline Evaluations pass
+
+The complete application can still fail.
+
+
+====================================================================
+11. APPLICATION-LEVEL FAILURES
+====================================================================
+
+Example:
+
+The answer is correct.
+
+The retriever is correct.
+
+The generator is correct.
+
+The pipeline is correct.
+
+BUT...
+
+The system takes 10 seconds to answer.
+
+User experience becomes poor.
+
+This means:
+
+Application-Level Evaluation is also required.
+
+
+====================================================================
+12. THREE LEVELS OF FAILURE POINTS
+====================================================================
+
+Level 1 - Component Level
+-------------------------
+
+Examples:
+
+• System Prompt
+• Retriever
+• Reranker
+• Embedding Model
+• Vector Database
+• Output Parser
+• Tool Selector
+• Agent Memory
+• Guardrails
+
+Any individual component can fail.
+
+
+Level 2 - Workflow / Pipeline Level
+------------------------------------
+
+Examples:
+
+• RAG Pipeline
+• Agent Workflow
+• Multi-turn Chat Workflow
+
+Components may work individually,
+but interactions may fail.
+
+
+Level 3 - Application Level
+----------------------------
+
+Examples:
+
+• Latency
+• Token Cost
+• Time to First Token
+• End-user experience
+
+The overall application can fail even when
+all internal components work.
+
+
+====================================================================
+13. SECOND MAJOR REASON:
+MULTIPLE RISK CATEGORIES
+====================================================================
+
+Apart from multiple failure points,
+different types of risks also exist.
+
+These risks are organized into three groups.
+
+1. Application Quality
+2. Safety
+3. Operations
+
+
+####################################################################
+APPLICATION QUALITY RISKS
+####################################################################
+
+Measures whether the application performs its intended job correctly.
+
+
+General LLM Applications
+------------------------
+
+• Correctness
+• Accuracy
+• Relevance
+• Completeness
+• Instruction Following
+
+
+RAG-Specific Risks
+------------------
+
+• Context Relevance
+• Retriever Recall
+• Groundedness
+• Faithfulness
+• Citation Accuracy
+
+
+Agent-Specific Risks
+--------------------
+
+• Tool Selection
+• Parameter Correctness
+• Task Completion
+• Error Recovery
+
+
+Multi-Turn Chatbots
+-------------------
+
+• Context Retention
+• Clarification Behaviour
+
+
+####################################################################
+SAFETY RISKS
+####################################################################
+
+Important Safety Dimensions:
+
+• Toxicity
+• Harmful Content
+• Bias
+• PII Leakage
+• Prompt Injection Resistance
+• Jailbreak Resistance
+
+Examples:
+
+• Revealing personal information.
+• Producing unsafe advice.
+• Generating harmful responses.
+
+
+####################################################################
+OPERATIONS RISKS
+####################################################################
+
+Operational Evaluations measure:
+
+• Latency
+• Cost per Request
+• Token Efficiency
+• Error Rate
+• Failure Rate
+• Latency Under Load
+
+Goal:
+
+Ensure the application runs efficiently
+in production.
+
+
+====================================================================
+14. FINAL TAKEAWAY
+====================================================================
+
+A single LLM application normally requires
+multiple evaluation pipelines.
+
+Reason 1:
+
+Multiple Failure Points
+
+• Component Level
+• Workflow Level
+• Application Level
+
+Reason 2:
+
+Multiple Risk Categories
+
+• Quality
+• Safety
+• Operations
+
+Therefore:
+
+One Application
+       |
+       +--> Component Evaluations
+       +--> Pipeline Evaluations
+       +--> Application Evaluations
+       +--> Safety Evaluations
+       +--> Operational Evaluations
+
+This is why a single evaluation pipeline is never
+sufficient for a production-grade LLM application.
+
+====================================================================
+END OF VIDEO 4 NOTES
+====================================================================

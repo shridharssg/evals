@@ -1,0 +1,383 @@
+====================================================================
+LLM EVALUATIONS - VIDEO 1
+INTRODUCTION TO LLM EVALUATIONS
+
+====================================================================
+2. WHAT IS THE PURPOSE OF LLM EVALUATIONS?
+====================================================================
+
+Most learners know how to build:
+
+• Chatbots
+• RAG Applications
+• Agentic AI Applications
+
+However, many do not know:
+
+• How to evaluate them
+• Whether they are ready for production
+• How to measure their quality
+• How to compare different versions of a system
+
+This playlist aims to answer questions such as:
+
+• How do you evaluate a RAG application?
+• How do you evaluate an Agentic AI application?
+
+
+====================================================================
+3. BENEFITS OF LEARNING LLM EVALUATIONS
+====================================================================
+
+Benefit 1: Competitive Advantage
+
+Most AI Engineer candidates learn how to build applications.
+Very few learn how to evaluate them properly.
+
+Because quality learning resources are limited, learning evaluations can
+provide a strong edge in interviews and industry work.
+
+
+Benefit 2: Production Mindset
+
+	Before learning evaluations:
+
+	"I built a project for my portfolio."
+
+	After learning evaluations:
+
+	"Can this application safely serve millions of users?"
+
+	The mindset shifts from project building to production readiness.
+
+
+====================================================================
+4. THE PROBLEM: HOW MOST PEOPLE TEST LLM APPLICATIONS
+====================================================================
+
+Typical approach:
+
+1. Build an LLM application.
+2. Ask a few questions.
+3. Receive reasonable answers.
+4. Assume the application works.
+
+The instructor calls this:
+
+VIBE TESTING
+
+Definition:
+
+Casually trying an LLM application with a few prompts and judging
+its quality based on intuition or feeling.
+
+Example:
+
+"I asked 5 to 10 questions. The answers looked good.
+Therefore the system must be working."
+
+Problems with Vibe Testing:
+
+• Informal
+• Subjective
+• Not repeatable
+• Not suitable for production systems
+
+It may be acceptable for personal projects but not for
+production-grade applications.
+
+
+====================================================================
+5. CASE STUDY #1 - AIR CANADA CHATBOT
+====================================================================
+
+Scenario:
+
+A customer asked Air Canada's chatbot about bereavement fare discounts.
+
+The chatbot incorrectly stated:
+
+• Buy the ticket now.
+• Receive the discount later as a refund.
+
+Actual policy:
+
+• Discount had to be applied before purchase.
+• Refund was not available later.
+
+Outcome:
+
+• Customer relied on chatbot advice.
+• Customer was denied the refund.
+• Customer sued Air Canada.
+
+Air Canada's defense:
+
+They argued that the chatbot was a separate entity.
+
+Court decision:
+
+The chatbot was part of the company's website and therefore the company
+was responsible for its output.
+
+Result:
+
+• Company lost the case.
+• Reputation damage occurred.
+
+Lesson:
+
+The chatbot should have been evaluated properly before deployment.
+
+
+====================================================================
+6. CASE STUDY #2 - CHEVROLET DEALERSHIP CHATBOT
+====================================================================
+
+Scenario:
+
+A dealership chatbot was manipulated through prompt-jailbreaking.
+
+User behavior:
+
+• Convinced the chatbot to obey all future instructions.
+• Asked whether a car could be sold for $1.
+
+Chatbot response:
+
+• Agreed to the request.
+• Produced a binding-looking offer.
+
+Outcome:
+
+• Screenshots spread online.
+• Significant negative publicity occurred.
+
+Lesson:
+
+Proper safety and evaluation testing could have identified this issue.
+
+
+====================================================================
+7. CASE STUDY #3 - HALLUCINATED LEGAL CASES
+====================================================================
+
+Scenario:
+
+A lawyer used ChatGPT to find previous legal cases related to airline
+injury incidents.
+
+What happened:
+
+• ChatGPT generated non-existent legal cases.
+• Case names, facts, and details were hallucinated.
+• The lawyer failed to verify them.
+• The fake cases were presented in court.
+
+Outcome:
+
+• Errors were discovered.
+• Monetary penalties were imposed.
+• The episode became widely discussed.
+
+Lesson:
+
+LLM outputs must always be evaluated and verified.
+
+
+====================================================================
+8. KEY LESSON FROM ALL THREE CASE STUDIES
+====================================================================
+
+Evaluation is critical.
+
+Deploying LLM applications without evaluation can lead to:
+
+• Incorrect information
+• Financial loss
+• Legal issues
+• Reputation damage
+• Unsafe behavior
+
+
+====================================================================
+9. WHY IS EVALUATING LLM APPLICATIONS DIFFICULT?
+====================================================================
+
+The instructor compares traditional software testing with
+LLM application evaluation.
+
+
+--------------------------------------------------------------------
+A. SOFTWARE SYSTEMS ARE DETERMINISTIC
+--------------------------------------------------------------------
+
+Definition:
+
+The same input produces the same output.
+
+Example:
+
+2 + 2 = 4
+
+The output is always identical.
+
+Testing becomes straightforward.
+
+
+--------------------------------------------------------------------
+B. LLM APPLICATIONS ARE PROBABILISTIC
+--------------------------------------------------------------------
+
+Definition:
+
+The same input may generate different outputs.
+
+Example:
+
+Question:
+"What is overfitting in machine learning?"
+
+Different users or different times may receive
+slightly different answers.
+
+All of them may still be valid.
+
+This makes testing much more challenging.
+
+
+====================================================================
+10. MULTI-DIMENSIONAL EVALUATION
+====================================================================
+
+Traditional software usually focuses on correctness.
+
+LLM applications require evaluation across multiple dimensions.
+
+Possible dimensions include:
+
+• Factual Accuracy
+• Completeness
+• Tone
+• Groundedness
+• Latency
+• Cost
+• User Experience
+
+Different applications may require different evaluation criteria.
+
+
+====================================================================
+11. GOAL OF THIS PLAYLIST
+====================================================================
+
+The playlist aims to teach:
+
+• How to evaluate LLM systems properly
+• How to measure quality objectively
+• How to make production decisions
+• How to avoid failures like those shown in the case studies
+
+
+====================================================================
+12. ROADMAP OF THE PLAYLIST
+====================================================================
+
+Topic 1
+-------
+What are LLM Evaluations?
+
+
+Topic 2
+-------
+LLM Evaluation Landscape
+
+• Terminology
+• Tools
+• Evaluation methods
+
+
+Topic 3
+-------
+LLM Model Evaluations
+
+Study benchmark families and evaluation techniques used to compare
+foundation models.
+
+
+Topic 4
+-------
+LLM Application Evaluations
+
+Learn how to evaluate applications built using LLMs.
+
+
+Topic 5
+-------
+Build Custom Evaluation Pipelines
+
+Learn how to:
+
+• Create Golden Datasets
+• Define Rubrics
+• Run Evaluations
+
+
+Topic 6
+-------
+RAG Evaluations
+
+Learn evaluation techniques specific to RAG systems.
+
+
+Topic 7
+-------
+Agent Evaluations
+
+Learn evaluation strategies for Agentic AI systems.
+
+
+Topic 8
+-------
+Safety Evaluations
+
+Learn how to test:
+
+• Unsafe behaviors
+• Jailbreak vulnerabilities
+• Reliability concerns
+
+
+Topic 9
+-------
+Operational Evaluations
+
+Post-deployment monitoring topics include:
+
+• Latency
+• Tokens per second
+• Time to First Token
+• System Load
+• Runtime Performance
+
+
+====================================================================
+13. FINAL TAKEAWAY
+====================================================================
+
+Before This Playlist:
+
+Build LLM Applications.
+
+After This Playlist:
+
+Build + Evaluate + Productionize LLM Applications.
+
+The primary message of the first video is:
+
+"Building an LLM application is not enough.
+A production-ready AI Engineer must also know how to evaluate it."
+
+====================================================================
+END OF VIDEO 1 NOTES
+====================================================================

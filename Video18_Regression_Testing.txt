@@ -1,0 +1,461 @@
+EVALS VIDEO 18 - REGRESSION TESTING FOR RAG EVALUATION SUITES
+=================================================================
+
+TOPIC
+-----------------------------------------------------------------
+Regression Testing for a RAG Evaluation Suite.
+
+Session Context
+-----------------------------------------------------------------
+The complete RAG Evaluation Suite has already been built.
+
+Evaluation Levels:
+
+1. Component Level
+2. Pipeline Level
+3. Application Level
+
+Covered Areas:
+
+- Quality Evaluations
+- Safety Evaluations
+- Operational Evaluations
+
+Around 14 different evaluation metrics have already been implemented.
+
+Examples:
+- Faithfulness
+- Answer Relevance
+- Safety Metrics
+- Operational Metrics
+
+This session focuses on Regression Testing.
+
+
+WHAT IS REGRESSION TESTING?
+=================================================================
+
+Meaning of Regression
+-----------------------------------------------------------------
+Regression means returning to a worse state than before.
+
+
+Definition of Regression Testing
+-----------------------------------------------------------------
+Regression Testing checks whether changes made to the system have
+caused any metric or capability to become worse.
+
+
+Example
+-----------------------------------------------------------------
+Suppose Recall is poor.
+
+To improve Recall:
+
+- Increase K value
+- Add a Reranker
+
+Result:
+
+Recall improves.
+
+However:
+
+- Precision may decrease.
+- Context Relevance may decrease.
+- Latency may increase.
+
+If only Recall is checked, these regressions may go unnoticed.
+
+Regression Testing ensures the entire system is re-evaluated after
+every change.
+
+
+WHY REGRESSION TESTING IS IMPORTANT
+=================================================================
+
+Problem
+-----------------------------------------------------------------
+Optimizing one metric can damage others.
+
+
+Solution
+-----------------------------------------------------------------
+After any system change:
+
+Run the complete evaluation suite.
+
+Compare all metrics with a previously accepted version.
+
+Deploy only if no unacceptable regression occurs.
+
+
+Relationship to Software Engineering
+-----------------------------------------------------------------
+Regression Testing is not unique to LLM systems.
+
+The same concept exists in traditional software:
+
+- APIs
+- Websites
+- Mobile applications
+- Desktop applications
+
+
+REGRESSION TESTING WORKFLOW
+=================================================================
+
+Step 1
+-----------------------------------------------------------------
+Create a script that runs the complete RAG Evaluation Suite.
+
+The script executes:
+
+- Quality Evaluations
+- Safety Evaluations
+- Operational Evaluations
+
+
+Step 2
+-----------------------------------------------------------------
+Run the suite once.
+
+Store results in:
+
+baseline.json
+
+This becomes the reference version.
+
+
+Step 3
+-----------------------------------------------------------------
+Modify the system.
+
+Examples:
+
+- Change K value
+- Change chunk size
+- Change model
+- Change system prompt
+- Add reranker
+
+
+Step 4
+-----------------------------------------------------------------
+Run the complete Evaluation Suite again.
+
+Store results in:
+
+candidate.json
+
+
+Step 5
+-----------------------------------------------------------------
+Compare baseline.json and candidate.json.
+
+Check each metric independently.
+
+Identify:
+
+- Improved metrics
+- Unchanged metrics
+- Regressed metrics
+
+
+THE NOISE PROBLEM
+=================================================================
+
+Problem
+-----------------------------------------------------------------
+Many evaluations use LLMs as judges.
+
+LLMs are probabilistic.
+
+Therefore:
+
+Running the exact same evaluation multiple times can produce
+slightly different scores.
+
+
+Example
+-----------------------------------------------------------------
+Run 1:
+Recall = 90.0
+
+Run 2:
+Recall = 89.7
+
+Run 3:
+Recall = 90.8
+
+No actual system change happened.
+
+Variance comes from LLM behavior.
+
+
+Solution: Noise Threshold
+=================================================================
+
+Process
+-----------------------------------------------------------------
+1. Run the same evaluation pipeline multiple times.
+
+2. Collect metric values.
+
+3. Calculate Standard Deviation.
+
+4. Define Noise Threshold.
+
+Suggested approach discussed:
+
+Noise Threshold = 2 × Standard Deviation
+
+
+Purpose
+-----------------------------------------------------------------
+Small fluctuations should be treated as noise.
+
+Only changes larger than the threshold should be classified as
+actual regressions or improvements.
+
+
+Example
+-----------------------------------------------------------------
+Baseline Recall = 90
+
+Noise Threshold = ±1
+
+Candidate Recall = 89.5
+
+Result:
+Not a regression.
+
+Reason:
+Difference remains inside acceptable noise range.
+
+
+Candidate Recall = 87.5
+
+Result:
+Regression.
+
+Reason:
+Difference exceeds noise threshold.
+
+
+METRIC REGISTRY
+=================================================================
+
+Purpose
+-----------------------------------------------------------------
+Store metadata for each metric.
+
+
+Two Important Properties
+-----------------------------------------------------------------
+1. Metric Direction
+
+- Higher is better
+OR
+- Lower is better
+
+
+2. Noise Threshold
+
+- Derived using repeated runs.
+
+
+Why It Is Needed
+-----------------------------------------------------------------
+The comparison system must know:
+
+- Whether a metric should increase or decrease.
+- What amount of change should be ignored as noise.
+
+
+FILES USED IN REGRESSION TESTING
+=================================================================
+
+1. run_suite.py
+-----------------------------------------------------------------
+Runs the complete evaluation suite.
+
+Includes:
+
+- Quality evaluations
+- Safety evaluations
+- Operational evaluations
+
+
+2. baseline.json
+-----------------------------------------------------------------
+Stores accepted reference metrics.
+
+
+3. candidate.json
+-----------------------------------------------------------------
+Stores metrics after new changes.
+
+
+4. metric_registry.py
+-----------------------------------------------------------------
+Stores:
+
+- Metric direction
+- Noise thresholds
+
+
+5. compare.py
+-----------------------------------------------------------------
+Compares:
+
+baseline.json
+vs
+candidate.json
+
+Uses metric_registry.py.
+
+Produces metric-level deltas.
+
+
+6. promote.py
+-----------------------------------------------------------------
+Decision framework.
+
+Determines whether:
+
+- Change should be promoted
+- Change should be reviewed
+- Change should be blocked
+
+
+REFINEMENTS MADE TO THE EVAL SUITE
+=================================================================
+
+Operational Evaluations
+-----------------------------------------------------------------
+Merged into a single file.
+
+Includes:
+
+- Latency
+- Cost
+- Reliability
+
+
+Safety Evaluations
+-----------------------------------------------------------------
+Merged into a single file.
+
+Includes:
+
+- Toxicity
+- Leakage
+- Scope Adherence
+
+
+Quality Evaluations
+-----------------------------------------------------------------
+Refactored to allow standard execution through a common harness.
+
+
+HARNESS FILE
+=================================================================
+
+Purpose
+-----------------------------------------------------------------
+Standardizes execution of quality evaluation files.
+
+Benefits:
+
+- Common input structure
+- Common output structure
+- Easier orchestration
+
+
+COMPARISON OUTPUT
+=================================================================
+
+Possible Outcomes Per Metric
+-----------------------------------------------------------------
+1. Improved
+2. Unchanged
+3. Regressed
+
+
+Interpretation
+-----------------------------------------------------------------
+A metric should not automatically be considered regressed if the
+change is within the noise threshold.
+
+
+PROMOTION DECISION FRAMEWORK
+=================================================================
+
+Purpose
+-----------------------------------------------------------------
+Automate deployment recommendations.
+
+
+Possible Decisions
+-----------------------------------------------------------------
+1. Promote
+
+Changes are acceptable.
+
+
+2. Review
+
+Human experts should review tradeoffs.
+
+
+3. Block
+
+Critical metrics show unacceptable regression.
+
+
+Example Discussed
+-----------------------------------------------------------------
+If a critical safety metric drops significantly,
+
+The change should be blocked.
+
+Even if several other metrics improved.
+
+
+KEY TAKEAWAYS
+=================================================================
+
+1. Regression means moving to a worse state.
+
+2. Regression Testing ensures improvements in one area do not
+   silently damage other areas.
+
+3. Every change should be evaluated using the complete RAG
+   Evaluation Suite.
+
+4. LLM-based evaluations introduce variance.
+
+5. Noise Thresholds are required to distinguish true regressions
+   from normal LLM variability.
+
+6. A Metric Registry should store:
+   - Metric Direction
+   - Noise Threshold
+
+7. Core Artifacts:
+   - run_suite.py
+   - baseline.json
+   - candidate.json
+   - metric_registry.py
+   - compare.py
+   - promote.py
+
+8. Regression Testing is a standard software engineering concept
+   and is equally important for LLM applications.
+
+9. Deployment decisions should consider the entire evaluation
+   suite rather than a single metric.
+
+10. Regression Testing is the final step that ties together the
+    complete RAG Evaluation Suite.

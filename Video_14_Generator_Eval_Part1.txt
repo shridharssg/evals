@@ -1,0 +1,541 @@
+====================================================================
+VIDEO 14 - PART 1
+RAG GENERATOR EVALUATION
+====================================================================
+
+1. SESSION OBJECTIVE
+====================================================================
+
+Current Goal:
+Build the RAG Evaluation Suite.
+
+Evaluation Levels:
+1. Component Level
+2. Pipeline Level
+3. Application Level
+
+Previous Session:
+Retriever Evaluation Completed.
+
+Metrics Covered:
+- Recall
+- Precision
+
+Today's Goals:
+1. Build and Evaluate the Generator.
+2. Build and Evaluate the Complete RAG Pipeline.
+
+
+====================================================================
+2. WHAT IS A GENERATOR?
+====================================================================
+
+RAG Flow:
+
+User Query
+    |
+Retriever
+    |
+Relevant Documents
+    |
+Generator (LLM)
+    |
+Answer
+
+Generator Input:
+- Query
+- Retrieved Context
+
+Generator Output:
+- Final Answer
+
+The Generator uses the question and retrieved context to generate the final answer.
+
+
+====================================================================
+3. GENERATOR PROMPT DESIGN
+====================================================================
+
+Core Instructions:
+
+- Use only information present in the context.
+- Do not use outside knowledge.
+- If the answer is not found in the context, explicitly say so.
+- Do not hallucinate.
+- Keep answers clear and concise.
+
+Purpose:
+The Generator must behave as a context-grounded assistant.
+
+
+====================================================================
+4. GENERATOR FAILURE MODES
+====================================================================
+
+A Generator can fail in two major ways:
+
+1. Unfaithful Responses
+2. Irrelevant Responses
+
+
+====================================================================
+5. FAILURE MODE #1 - UNFAITHFUL RESPONSES
+====================================================================
+
+Question:
+Does the CampusX AI Engineering Program include live classes?
+
+Context:
+- Recorded lessons
+- Coding assignments
+- Projects
+- Weekly doubt sessions
+
+Generated Answer:
+"Yes, the program includes two live classes every week."
+
+Problem:
+The context never mentioned live classes.
+
+The Generator invented information.
+
+This is:
+- Hallucination
+- Unfaithful generation
+
+
+====================================================================
+6. FAITHFULNESS
+====================================================================
+
+Definition:
+
+Faithfulness measures how much of the generated
+answer comes directly from the provided context.
+
+Important:
+
+Faithfulness DOES NOT mean correctness.
+
+Example:
+
+Suppose the Retriever fetches incorrect context.
+
+If the Generator answers strictly using that incorrect context:
+
+- The answer may still be wrong.
+- But it can still be faithful.
+
+Therefore:
+
+Faithfulness != Correctness
+
+Faithfulness only answers:
+
+"Did the answer come from the provided context?"
+
+
+====================================================================
+7. FAILURE MODE #2 - IRRELEVANT RESPONSES
+====================================================================
+
+Question:
+Does the program include live classes?
+
+Answer:
+"The program includes coding assignments,
+projects, recorded lessons, and weekly doubt sessions."
+
+Analysis:
+
+Faithful?
+YES.
+
+Relevant?
+NO.
+
+Reason:
+The answer never addresses the user's question.
+
+The answer uses the context correctly but fails
+to answer the actual question.
+
+
+====================================================================
+8. ANSWER RELEVANCE
+====================================================================
+
+Definition:
+
+Answer Relevance measures whether the generated
+answer actually answers the user's question.
+
+Good Answer Example:
+
+"The provided context does not confirm whether
+the program includes live classes.
+
+It only mentions:
+- Recorded lessons
+- Coding assignments
+- Projects
+- Weekly doubt-solving sessions."
+
+This answer is:
+
+- Faithful
+- Relevant
+
+
+====================================================================
+9. GENERATOR EVALUATION METRICS
+====================================================================
+
+Metrics Used:
+
+1. Faithfulness
+2. Answer Relevance
+
+Metrics Deferred To Application Level:
+
+- Correctness
+- Completeness
+- Citation Accuracy - ignore it
+- Style  			- ignore it
+
+
+====================================================================
+10. FAITHFULNESS CALCULATION
+====================================================================
+
+Dataset Structure:
+
+Question
+Golden Context
+
+Example:
+
+Question:
+What is RAG Triad?
+
+Golden Context:
+Relevant chunks discussing RAG Triad.
+
+Process:
+
+Step 1:
+Send Question + Golden Context to Generator.
+
+Step 2:
+Generator produces an Answer.
+
+Step 3:
+LLM-as-a-Judge breaks the answer into claims.
+
+Example:
+
+Claim 1
+Claim 2
+Claim 3
+Claim 4
+Claim 5
+
+Step 4:
+Check whether each claim exists inside the Golden Context.
+
+Example:
+
+Claim 1 -> Present
+Claim 2 -> Present
+Claim 3 -> Missing
+Claim 4 -> Present
+Claim 5 -> Missing
+
+Step 5:
+
+Faithfulness Score = Number of Supported Claims
+--------------------------------
+Total Number of Claims
+
+Faithfulness = 3/5
+
+Repeat:
+- For every question
+- Average all results
+
+Final Output: Faithfulness Score
+
+
+====================================================================
+11. ANSWER RELEVANCE CALCULATION
+====================================================================
+
+Question + Generated Answer
+
+Step 1:
+Break Answer into Claims.
+
+Example:
+
+Claim 1:
+Scores become clustered.
+
+Claim 2:
+Benchmarks stop differentiating models.
+
+Claim 3:
+Benchmark contamination means
+test data leaking into training data.
+
+Step 2:
+Ask LLM Judge:
+
+"Does this claim help answer the question?"
+
+Results:
+
+Claim 1 -> Relevant
+Claim 2 -> Relevant
+Claim 3 -> Irrelevant
+
+Step 3:
+
+Answer Relevance = Relevant Claims
+-----------------
+Total Claims
+
+Answer Relevance = 2/3
+
+Repeat for all questions.
+
+Average results to obtain the final Answer Relevance Score.
+
+
+====================================================================
+12. GENERATOR DATASET CREATION
+====================================================================
+
+Process Used:
+
+Step 1:
+Export all chunks from the vector database.
+
+Total Chunks:
+Approximately 862.
+
+Step 2:
+Upload chunks to Claude.
+
+Step 3:
+Generate:
+- Question
+- Golden Context
+
+pairs.
+
+Step 4:
+Manually review the generated data.
+
+Step 5:
+Keep only valid entries.
+
+Final Dataset:
+
+15 Questions
+15 Golden Contexts
+
+
+====================================================================
+13. GENERATOR EVALUATION IN DEEPEVAL
+====================================================================
+
+LLM Test Case Structure:
+
+Input:
+Question
+
+Actual Output:
+Generator Answer
+
+Retrieved Context:
+Golden Context
+
+Metrics:
+
+1. Faithfulness
+2. Answer Relevance
+
+Judge Model:
+GPT-4o-mini
+
+
+====================================================================
+14. INITIAL GENERATOR RESULTS
+====================================================================
+
+Initial Scores:
+
+Faithfulness: ~91%
+
+Answer Relevance: ~73%
+
+Observation:
+
+Faithfulness is already high because modern
+LLMs generally follow context-based instructions
+reasonably well.
+
+
+====================================================================
+15. IMPROVING GENERATOR PERFORMANCE
+====================================================================
+
+Main Improvement Methods:
+
+1. Better Model
+2. Better System Prompt
+
+Strategy Used:
+Prompt Improvement
+
+Process:
+
+- Run evaluation.
+- Inspect failed test cases.
+- Analyze failure reasons.
+- Improve prompt.
+- Re-run evaluation.
+- Repeat multiple times.
+
+
+====================================================================
+16. PROMPT IMPROVEMENTS
+====================================================================
+
+Added Rules:
+
+- Avoid overstatement.
+- Avoid unsupported claims.
+- Avoid inventing details.
+- Stay aligned with context.
+- Preserve source meaning.
+- Use context carefully.
+
+
+====================================================================
+17. IMPROVED RESULTS
+====================================================================
+
+After Prompt Refinement:
+
+Faithfulness: ~96%
+
+Answer Relevance: ~92%
+
+Result:
+Generator quality improved significantly.
+
+
+====================================================================
+18. COMPONENT-LEVEL EVALUATION COMPLETED
+====================================================================
+
+Retriever Metrics:
+- Recall
+- Precision
+
+Generator Metrics:
+- Faithfulness
+- Answer Relevance
+
+Component-Level Evaluation is now complete.
+
+Four Metrics Learned:
+
+1. Recall
+2. Precision
+3. Faithfulness
+4. Answer Relevance
+
+
+====================================================================
+END OF VIDEO 14 - PART 1
+RAG GENERATOR EVALUATION
+====================================================================
+
+
+https://github.com/campusx-official/rag-eval-deepeval/blob/main/evals/eval_generator.py
+
+
+
+"""
+evals/eval_generator.py
+=======================
+Component-level evaluation of the GENERATOR, in isolation.
+
+Faithfulness: of the claims in the generated answer, how many are supported
+by the context it was given? (Did the generator make things up?)
+
+ISOLATION: we feed the generator the GOLDEN context (the known-good chunks
+from the faithfulness dataset), NOT the retriever's output. So a low score
+is purely the generator's fault --- the context was already correct.
+
+    python -m evals.eval_generator
+"""
+
+from dotenv import load_dotenv
+
+from deepeval import evaluate
+from deepeval.test_case import LLMTestCase
+from deepeval.metrics import FaithfulnessMetric, AnswerRelevancyMetric
+
+from src.generator import generate   # your generator: generate(query, context) -> answer
+from evals.harness import load_goldens, summarize_by_metric, print_summary
+
+load_dotenv()
+
+GOLDEN_PATH = "goldens/faithfulness_dataset.json"
+JUDGE_MODEL = "gpt-4o-mini"
+THRESHOLD = 0.7
+
+
+def run():
+    # 1. LOAD the faithfulness golden set (query + ideal_context)
+    goldens = load_goldens(GOLDEN_PATH)
+
+    # 2. RUN THE GENERATOR on the GOLDEN context (isolation), build one test case each
+    test_cases = []
+    for g in goldens:
+        context = g["ideal_context"]              # known-good context (list of chunk strings)
+        answer = generate(g["query"], context)    # RUN the generator -> actual_output
+
+        test_cases.append(
+            LLMTestCase(
+                input=g["query"],
+                actual_output=answer,             # the generated answer we're judging
+                retrieval_context=context,        # faithfulness checks the answer against THIS
+                # no expected_output --- faithfulness never reads it
+            )
+        )
+
+    # 3. THE METRICS --- decompose actual_output into claims, attribute each to context
+    metrics = [
+        FaithfulnessMetric(
+            threshold=THRESHOLD,
+            model=JUDGE_MODEL,
+            include_reason=True,   # prints WHY each score --- shows which claims were unsupported
+        ),
+        AnswerRelevancyMetric(
+            threshold=THRESHOLD,
+            model=JUDGE_MODEL,
+            include_reason=True,
+        ),
+    ]
+
+    # 4. EVALUATE --- runs the metrics on every case, prints a report
+    result = evaluate(test_cases=test_cases, metrics=metrics)
+    return summarize_by_metric(result)
+
+
+if __name__ == "__main__":
+    print_summary("generator", run())

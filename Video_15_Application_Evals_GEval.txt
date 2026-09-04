@@ -1,0 +1,517 @@
+EVALS - VIDEO 15 NOTES (English, Interview & Learning Focused)
+=================================================================
+
+TOPIC
+-----------------------------------------------------------------
+Application-Level Evaluation for RAG Systems using G-Eval
+
+Session Context
+-----------------------------------------------------------------
+The offline evaluation suite is being built at three levels:
+
+1. Component Level
+2. Pipeline Level
+3. Application Level
+
+Component-level evaluations and RAG pipeline evaluations were already completed.
+This session focuses on Application-Level Quality Evaluation.
+
+
+Application-Level Evaluation Categories
+-----------------------------------------------------------------
+1. Quality
+2. Safety
+3. Operations
+
+This session covers Quality Evaluation.
+
+
+Quality Metrics Covered
+-----------------------------------------------------------------
+1. Correctness
+2. Completeness
+3. Style
+
+
+Metric 1: Correctness
+-----------------------------------------------------------------
+Purpose:
+Check whether the generated answer is factually correct.
+
+Definition:
+The answer should be correct according to universally accepted facts,
+not merely according to the retrieved context.
+
+
+Metric 2: Completeness
+-----------------------------------------------------------------
+Purpose:
+Check whether the generated answer covers all parts of the question.
+
+Example:
+If a question contains multiple sub-questions, the answer should address
+all of them and not provide only a partial response.
+
+
+Metric 3: Style
+-----------------------------------------------------------------
+Purpose:
+Check whether the generated answer follows the desired teaching style.
+
+Example used in the session:
+Answers should match the CampusX teaching style.
+
+
+Previously Covered Metrics
+-----------------------------------------------------------------
+1. Recall
+2. Precision
+3. Faithfulness
+4. Answer Relevance
+5. Context Relevance
+
+Common characteristic:
+All of them are count-based metrics.
+
+
+Count-Based Metrics
+=================================================================
+
+What Count-Based Metrics Do
+-----------------------------------------------------------------
+The answer is broken into claims.
+
+Then count:
+- Which claims satisfy the evaluation condition
+- Which claims do not
+
+A score is calculated using ratios.
+
+
+Faithfulness Example
+-----------------------------------------------------------------
+Process:
+
+1. Break generated answer into claims.
+2. Check whether each claim exists in the retrieved context.
+3. Count valid claims.
+4. Calculate ratio.
+
+Example:
+
+Total claims = 4
+Claims supported by context = 3
+Unsupported claims = 1
+
+Faithfulness Score = 3 / 4
+
+
+Why Count-Based Evaluation Fails for Some Metrics
+=================================================================
+
+Style Evaluation Problem
+-----------------------------------------------------------------
+Style cannot be evaluated claim-by-claim.
+
+Reason:
+A teaching style exists at answer level, not necessarily at sentence level.
+
+Therefore:
+Style requires judgment, not counting.
+
+
+Correctness Evaluation Problem
+-----------------------------------------------------------------
+Correctness also cannot always be checked using independent claims.
+
+Reason:
+Answers may contain:
+- Analogies
+- Explanations
+- Supporting examples
+
+These make sense only when evaluated as part of the complete answer.
+
+Therefore:
+Correctness also requires judgment.
+
+
+Examples of Judgment-Based Metrics
+-----------------------------------------------------------------
+- Correctness
+- Completeness
+- Style
+- Helpfulness
+- Safety-related metrics
+
+
+LLM-as-a-Judge
+=================================================================
+
+Basic Idea
+-----------------------------------------------------------------
+Use an LLM to evaluate the answer and assign a score.
+
+
+Required Inputs
+-----------------------------------------------------------------
+1. Question
+2. Expected (golden) answer
+3. Actual generated answer
+
+
+Golden Dataset
+-----------------------------------------------------------------
+Contains:
+
+Question → Correct Answer
+
+Example used in session:
+15 questions with ideal answers.
+
+
+Judge Prompt Example Logic
+-----------------------------------------------------------------
+Provide:
+
+- Question
+- Expected Answer
+- Actual Answer
+
+Ask the LLM:
+
+Compare the actual answer against the expected answer and assign
+a correctness score from 0 to 10.
+
+
+Process Flow
+-----------------------------------------------------------------
+Golden Dataset Question
+        ↓
+RAG Application
+        ↓
+Generated Answer
+        ↓
+LLM Judge
+        ↓
+Score
+        ↓
+Average Across All Questions
+
+
+Problem with Basic LLM-as-a-Judge
+=================================================================
+
+Main Issue
+-----------------------------------------------------------------
+High Variance in Scores.
+
+Same inputs may produce different evaluation scores across multiple runs.
+
+
+Reason 1
+-----------------------------------------------------------------
+The evaluation criteria are too high level.
+
+Example:
+
+"Compare the actual answer against the expected answer and
+decide how factually correct it is."
+
+Different calls may interpret correctness differently.
+
+
+Reason 2
+-----------------------------------------------------------------
+Direct score generation (0 to 10).
+
+The model may alternate between nearby scores such as:
+- 7
+- 8
+- 9
+
+because of token probability differences.
+
+Result:
+Evaluation becomes less reliable.
+
+
+
+
+********************************************************************************************
+G-Eval
+=================================================================
+
+Definition
+-----------------------------------------------------------------
+G-Eval is a research-paper-based evaluation technique introduced in 2023.
+
+Goal:
+Improve reliability of LLM-as-a-Judge evaluations.
+
+
+Core Idea 1: Criteria → Evaluation Steps
+-----------------------------------------------------------------
+Input:
+
+Metric Name + High-Level Criteria
+
+Example Criteria:
+
+Compare the actual answer against the expected answer and
+decide how factually correct it is.
+
+
+G-Eval Action
+-----------------------------------------------------------------
+Uses an LLM (GPT-4 mentioned in the session) and Chain of Thought
+reasoning to convert the criteria into detailed evaluation steps.
+
+This creates a rulebook/constitution for evaluation.
+
+
+Benefit
+-----------------------------------------------------------------
+More deterministic evaluation.
+Less variation between runs.
+
+
+Example Evaluation Rules Shown
+-----------------------------------------------------------------
+- Compare factual claims only.
+- Penalize contradictions.
+- Do not penalize brevity alone.
+- Additional correct information should not reduce score.
+
+
+Core Idea 2: Probability Weighted Scoring
+=================================================================
+
+Problem
+-----------------------------------------------------------------
+Directly using the generated score token (for example 8).
+
+
+Instead
+-----------------------------------------------------------------
+Use token probabilities.
+
+Example:
+
+Token 8 → 0.70
+Token 7 → 0.20
+Token 9 → 0.05
+
+Non-numeric tokens are ignored.
+
+Probabilities are normalized.
+
+Weighted average is calculated.
+
+Result Example:
+
+Weighted Score = 7.84
+
+instead of simply returning 8.
+
+
+Benefit
+-----------------------------------------------------------------
+Scores become more stable between evaluation runs.
+
+Instead of:
+
+6 → 8 → 7
+
+Scores move slightly:
+
+7.84 → 7.90 → 7.70
+
+
+Two Main Innovations of G-Eval
+-----------------------------------------------------------------
+1. Convert high-level criteria into detailed evaluation steps.
+2. Use probability-weighted scoring instead of raw score tokens.
+
+
+Correctness Evaluation Pipeline
+=================================================================
+
+Steps
+-----------------------------------------------------------------
+1. Create golden dataset.
+2. Create G-Eval metric.
+3. Define evaluation steps.
+4. Define rubric.
+5. Run evaluation against all test cases.
+6. Average scores.
+
+
+Correctness vs Faithfulness
+=================================================================
+
+Faithfulness
+-----------------------------------------------------------------
+Answer is grounded in retrieved context.
+
+
+Correctness
+-----------------------------------------------------------------
+Answer is factually correct according to the real world.
+
+
+Possible Situations
+-----------------------------------------------------------------
+1. Correct and Faithful
+   Ideal case.
+
+2. Correct but Not Faithful
+   Model answered from training knowledge instead of context.
+
+3. Faithful but Incorrect
+   Context itself contains wrong information.
+
+4. Not Faithful and Incorrect
+   Hallucinated and wrong.
+
+
+Evaluation Steps vs Criteria
+=================================================================
+
+Criteria
+-----------------------------------------------------------------
+High-level description.
+
+
+Evaluation Steps
+-----------------------------------------------------------------
+Detailed instructions used by the judge.
+
+
+Recommendation from Session
+-----------------------------------------------------------------
+Early stage:
+- Use criteria.
+
+Later stage:
+- Manually define evaluation steps.
+
+Reason:
+Manual evaluation steps reduce variability.
+
+
+Rubric
+=================================================================
+
+Purpose
+-----------------------------------------------------------------
+Explicitly define scoring ranges.
+
+Example:
+
+0 to 4  -> Clear factual errors
+5 to 8  -> Mostly correct with minor inaccuracies
+9 to 10 -> Factually correct
+
+Benefit:
+More control over scoring behavior.
+
+
+Completeness Evaluation
+=================================================================
+
+Definition
+-----------------------------------------------------------------
+Measures whether the generated answer covers all important parts
+of the ideal answer.
+
+
+Example
+-----------------------------------------------------------------
+Ideal Answer:
+- A
+- B
+- C
+
+Generated Answer:
+- A
+- B
+
+LLM Judge evaluates coverage and assigns score.
+
+
+Improvement Used in Session
+-----------------------------------------------------------------
+Generator prompt was modified to:
+
+- Identify every part of the question.
+- Cover every part.
+- Include all relevant points from context.
+- Handle multi-part questions fully.
+
+Result reported:
+Completeness score improved significantly.
+
+
+Style Evaluation
+=================================================================
+
+Definition
+-----------------------------------------------------------------
+Measures whether responses follow the required teaching style.
+
+No ideal answer is required.
+
+A style rubric is required.
+
+
+CampusX Style Characteristics Mentioned
+-----------------------------------------------------------------
+- Intuitive explanation style
+- Plain language
+- Explain idea before formulas
+- Explain technical terms briefly
+- Conversational teaching tone
+- Use examples/analogies when useful
+
+
+Style Scoring Rubric Example
+-----------------------------------------------------------------
+9 to 10
+- Strong CampusX teaching style
+
+5 to 8
+- Understandable but somewhat formal or textbook-like
+
+0 to 4
+- Dry, rigid, jargon-heavy, robotic
+
+
+Prompt Engineering Observation
+=================================================================
+
+Key Point
+-----------------------------------------------------------------
+Prompt engineering can improve evaluation scores.
+
+Examples shown:
+
+- Refining generator prompts improved completeness.
+- Refining style instructions improved style score.
+
+
+Final Takeaways
+=================================================================
+
+1. Some metrics are count-based; others require judgment.
+2. Correctness, Completeness and Style are judgment-based metrics.
+3. LLM-as-a-Judge is the foundation.
+4. Basic LLM-as-a-Judge suffers from score variance.
+5. G-Eval improves reliability.
+6. G-Eval's two core innovations:
+   - Criteria → Evaluation Steps
+   - Probability Weighted Scoring
+7. Golden datasets are required for Correctness and Completeness.
+8. Style evaluation relies on a well-defined rubric.
+9. Evaluation Steps and Rubrics reduce variability.
+10. Prompt engineering can improve evaluation outcomes.

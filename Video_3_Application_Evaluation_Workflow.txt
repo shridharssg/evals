@@ -1,0 +1,430 @@
+====================================================================
+VIDEO 3 - LLM EVALUATIONS
+HOW APPLICATION EVALUATIONS WORK
+====================================================================
+1. FOCUS OF THIS VIDEO
+====================================================================
+This video focuses on:
+
+HOW LLM APPLICATION EVALUATIONS ARE PERFORMED.
+
+The explanation is given from the Application Evaluation perspective,
+not the Model Evaluation perspective.
+
+
+====================================================================
+2. APPLICATION EVALUATION WORKFLOW
+====================================================================
+
+The instructor introduces a generic workflow used to evaluate
+LLM-powered applications.
+
+This workflow can later be applied to:
+
+• Simple LLM Systems
+• RAG Applications
+• Agents
+• More Complex AI Systems
+
+
+####################################################################
+EXAMPLE APPLICATION
+####################################################################
+
+Company:
+Zomato (example scenario)
+
+Problem:
+
+The company receives a large number of customer emails.
+
+Goal:
+
+Automatically classify incoming emails into categories:
+
+• Billing Query
+• Technical Query
+• General Query
+
+Benefits:
+
+• Billing emails go to billing team.
+• Technical emails go to technical team.
+• General emails go to support team.
+
+Instead of manual routing, an LLM performs the classification.
+
+
+====================================================================
+STEP 1 - DEFINE TASK AND TARGET
+====================================================================
+
+First identify:
+
+What exactly is being evaluated?
+
+In this example:
+
+Target:
+The email classification system.
+
+Task:
+Determine whether the system correctly classifies emails.
+
+
+====================================================================
+STEP 2 - DEFINE SUCCESS CRITERIA
+====================================================================
+
+Define what success means.
+
+For the email classification application:
+
+Success Metric:
+Accuracy
+
+Example:
+
+100 emails processed.
+90 classified correctly.
+
+Accuracy = 90%
+
+The evaluation goal is therefore to measure classification accuracy.
+
+
+====================================================================
+STEP 3 - BUILD A GOLDEN DATASET
+====================================================================
+
+Create an evaluation dataset.
+
+Example Dataset:
+
+Email Content                      | Expected Category
+------------------------------------------------------
+My card was charged twice          | Billing
+App crashes while logging in       | Technical
+What are your working hours?       | General
+
+In practice:
+
+• 50 to 500 examples may be used.
+• Real historical company data is preferred.
+• Labels are created manually.
+
+This evaluation dataset is called:
+
+GOLDEN DATASET
+
+
+====================================================================
+STEP 4 - DEFINE EVALUATION METHOD
+====================================================================
+
+Decide who or what performs the evaluation.
+
+Possible Options:
+
+1. Automated Evaluation
+2. Human Evaluation
+3. LLM-as-a-Judge Evaluation
+
+
+--------------------------------------------------------------------
+AUTOMATED EVALUATION
+--------------------------------------------------------------------
+
+Suitable when answers are structured.
+
+Example:
+
+Expected Output: Billing
+Actual Output: Billing
+
+A simple program can compare outputs and calculate accuracy.
+
+
+--------------------------------------------------------------------
+HUMAN EVALUATION
+--------------------------------------------------------------------
+
+Humans review generated outputs.
+
+Advantage:
+
+• High-quality judgement.
+
+Disadvantage:
+
+• Expensive
+• Slow
+• Difficult to scale
+
+
+--------------------------------------------------------------------
+LLM-AS-A-JUDGE
+--------------------------------------------------------------------
+
+Useful when output is long-form text.
+
+Example:
+
+Question -> Long Answer
+
+Comparing semantic meaning becomes difficult using code.
+
+An LLM can be used as the evaluator.
+
+
+====================================================================
+STEP 5 - RUN THE MODEL
+====================================================================
+
+The golden dataset is sent through the application.
+
+Example:
+
+Input Email
+      |
+      v
+LLM Classification System
+      |
+      v
+Predicted Category
+
+The system generates outputs for all test examples.
+
+
+====================================================================
+STEP 6 - EVALUATE RESULTS
+====================================================================
+
+Use the chosen evaluation method.
+
+Example:
+
+If Accuracy = 80%
+
+It means:
+
+80 emails classified correctly.
+20 emails classified incorrectly.
+
+
+====================================================================
+STEP 7 - ANALYZE RESULTS
+====================================================================
+
+Analyze why failures occurred.
+
+Possible Causes:
+
+1. Poor System Prompt
+
+The prompt may cause confusion between:
+
+• Billing
+• Technical
+• General categories
+
+
+2. Wrong Model Choice
+
+The selected LLM may not be capable enough.
+
+
+3. Other System Design Issues
+
+Review the application architecture and logic.
+
+
+====================================================================
+STEP 8 - IMPROVE THE SYSTEM
+====================================================================
+
+Examples of Improvements:
+
+• Improve the prompt.
+• Change the model.
+• Refine application logic.
+
+The goal is to improve evaluation scores.
+
+
+====================================================================
+STEP 9 - REPEAT THE EVALUATION
+====================================================================
+
+This is where the concept of repeatability becomes important.
+
+Workflow:
+
+Original System
+      |
+Evaluation
+      |
+Results
+      |
+Improvements
+      |
+Re-Evaluation
+
+Example:
+
+Version 1 -> 80% Accuracy
+
+Prompt Improvement
+
+Version 2 -> 90% Accuracy
+
+Model Upgrade
+
+Version 3 -> 95% Accuracy
+
+The same dataset is reused.
+
+This allows objective comparison.
+
+
+====================================================================
+STEP 10 - DEPLOY THE SYSTEM
+====================================================================
+
+When performance reaches an acceptable level:
+
+Deploy the application.
+
+However:
+
+Evaluation does not stop after deployment.
+
+
+====================================================================
+STEP 11 - MONITOR THE SYSTEM
+====================================================================
+
+Monitor production behaviour continuously.
+
+Reason:
+
+A system that performs well on evaluation data
+may still fail in production.
+
+New user inputs may expose weaknesses.
+
+
+====================================================================
+STEP 12 - CAPTURE PRODUCTION FAILURES
+====================================================================
+
+Example:
+
+A billing email is incorrectly routed to the Technical Team.
+
+The mistake is reported.
+
+This production failure becomes valuable data.
+
+
+====================================================================
+STEP 13 - FEEDBACK LOOP
+====================================================================
+
+Production Failure
+        |
+        v
+Add to Golden Dataset
+        |
+        v
+Run Evaluation Again
+        |
+        v
+Improve System
+        |
+        v
+Redeploy
+
+This creates a continuous improvement cycle.
+
+The golden dataset becomes richer over time.
+
+
+====================================================================
+3. IMPORTANT INSIGHT
+====================================================================
+
+One Application May Have Multiple Evaluations.
+
+A common misconception is:
+
+One System -> One Evaluation
+
+Reality:
+
+One System -> Multiple Evaluations
+
+
+Example: RAG Application
+
+Evaluation 1:
+Retriever Performance
+
+Evaluation 2:
+Embedding Quality
+
+Evaluation 3:
+Complete RAG Workflow
+
+Evaluation 4:
+Latency Evaluation
+
+Evaluation 5:
+System-Level Evaluation
+
+Therefore:
+
+A single application usually contains multiple evaluation pipelines.
+
+
+====================================================================
+4. COMPLETE EVALUATION LIFECYCLE
+====================================================================
+
+1. Define Task & Target
+2. Define Success Criteria
+3. Create Golden Dataset
+4. Choose Evaluation Method
+5. Run the System
+6. Evaluate Results
+7. Analyze Failures
+8. Improve System
+9. Repeat Evaluation
+10. Deploy
+11. Monitor
+12. Capture Failures
+13. Update Golden Dataset
+14. Repeat Forever
+
+This lifecycle is the foundation of Application Evaluation.
+
+====================================================================
+KEY TAKEAWAY
+====================================================================
+
+LLM Application Evaluation is not a one-time activity.
+
+It is a continuous loop involving:
+
+• Testing
+• Analysis
+• Improvement
+• Deployment
+• Monitoring
+• Feedback
+
+Reliable LLM systems are built by repeatedly running this cycle.
+
+====================================================================
+END OF VIDEO 3 NOTES
+====================================================================

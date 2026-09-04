@@ -1,0 +1,711 @@
+
+
+====================================================================
+VIDEO 14 - PART 2
+RAG PIPELINE EVALUATION (RAG TRIAD)
+DETAILED ENGLISH NOTES
+====================================================================
+
+PART 2 FOCUS
+====================================================================
+
+After completing Component-Level Evaluation:
+
+Retriever:
+- Recall
+- Precision
+
+Generator:
+- Faithfulness
+- Answer Relevance
+
+The next step is:
+
+PIPELINE-LEVEL EVALUATION
+
+Goal:
+
+Evaluate the complete RAG workflow after connecting
+the Retriever and the Generator.
+
+====================================================================
+1. BUILDING THE RAG PIPELINE
+====================================================================
+
+Before Pipeline Evaluation we must first build
+the complete RAG pipeline.
+
+Pipeline Flow:
+
+User Question
+      |
+      v
+  Retriever
+      |
+      v
+Retrieved Context
+      |
+      v
+  Generator
+      |
+      v
+ Final Answer
+
+Implementation Logic:
+
+Step 1:
+Send Question to Retriever.
+
+Step 2:
+Retriever fetches relevant context.
+
+Step 3:
+Pass both:
+
+- Question
+- Retrieved Context
+
+to Generator.
+
+Step 4:
+Generator creates final answer.
+
+Step 5:
+Return answer to user.
+
+This is the complete RAG Pipeline.
+
+====================================================================
+2. WHY PIPELINE EVALUATION IS NEEDED
+====================================================================
+
+Question:
+
+If Retriever is working correctly
+AND
+Generator is working correctly
+
+Does that automatically mean that the
+entire RAG application is working correctly?
+
+Answer:
+
+NO.
+
+Reason:
+
+Individual components can work correctly,
+but their interaction may fail.
+
+This is the primary reason Pipeline-Level
+Evaluation exists.
+
+====================================================================
+3. THE RAG TRIAD
+====================================================================
+
+Pipeline-Level Evaluation is usually performed
+using a framework called:
+
+RAG TRIAD
+
+Three entities exist inside a RAG pipeline:
+
+1. Question
+2. Context
+3. Answer
+
+These three entities create three relationships.
+
+Question <--> Context
+
+Context <--> Answer
+
+Question <--> Answer
+
+Each relationship has a metric.
+
+====================================================================
+4. METRIC #1 - CONTEXTUAL RELEVANCE
+====================================================================
+
+Relationship:
+
+Question <--> Context
+
+Purpose:
+
+Determine whether the retrieved context is
+actually relevant to the user's question.
+
+Question:
+
+Did the Retriever fetch useful information?
+
+This metric primarily evaluates Retriever quality
+inside the full RAG Pipeline.
+
+====================================================================
+5. METRIC #2 - FAITHFULNESS
+====================================================================
+
+Relationship:
+
+Context <--> Answer
+
+Purpose:
+
+Determine whether the Answer was generated
+from the Retrieved Context.
+
+Question:
+
+Did the Generator stay grounded
+in the retrieved information?
+
+This checks hallucination.
+
+====================================================================
+6. METRIC #3 - ANSWER RELEVANCE
+====================================================================
+
+Relationship:
+
+Question <--> Answer
+
+Purpose:
+
+Check whether the generated answer
+actually answers the user's question.
+
+Question:
+
+Even if the answer is faithful,
+is it actually useful to the user?
+
+====================================================================
+7. WHY PIPELINE FAITHFULNESS IS DIFFERENT
+====================================================================
+
+Component-Level Faithfulness:
+
+Question
++
+Golden Context
+      |
+      v
+Generator
+
+Context comes from:
+
+Golden Dataset
+
+------------------------------------------------------------
+
+Pipeline-Level Faithfulness:
+
+Question
+      |
+      v
+Retriever
+      |
+      v
+Retrieved Context
+      |
+      v
+Generator
+
+Context comes from:
+
+Retriever
+
+------------------------------------------------------------
+
+Therefore:
+
+Scores can change significantly.
+
+The Generator may be good.
+
+But the Retriever may provide
+noisy context.
+
+Pipeline-level evaluation captures this effect.
+
+====================================================================
+8. CONTEXTUAL RELEVANCE
+====================================================================
+
+Definition:
+
+Measures how relevant the retrieved context is
+for answering the question.
+
+====================================================================
+9. HOW CONTEXTUAL RELEVANCE IS CALCULATED
+====================================================================
+
+Step 1
+
+Send Question to Retriever.
+
+Question
+    |
+Retriever
+    |
+Retrieved Context
+
+------------------------------------------------------------
+
+Step 2
+
+Take the Retrieved Context.
+
+Break every context chunk into claims.
+
+Example:
+
+Chunk 1
+  -> Claim 1
+  -> Claim 2
+  -> Claim 3
+
+Chunk 2
+  -> Claim 4
+  -> Claim 5
+
+...
+
+Assume Total Claims = 15
+
+------------------------------------------------------------
+
+Step 3
+
+For every claim ask:
+
+Is this claim relevant to the question?
+
+Use an LLM-as-a-Judge.
+
+Example:
+
+Claim 1 -> Relevant
+
+Claim 2 -> Relevant
+
+Claim 3 -> Irrelevant
+
+Claim 4 -> Relevant
+
+...
+
+Suppose:
+
+Relevant Claims = 10
+
+Total Claims = 15
+
+------------------------------------------------------------
+
+Step 4
+
+Calculate:
+
+Contextual Relevance
+
+=
+
+Relevant Claims
+---------------------------
+Total Claims
+
+=
+
+10 / 15
+
+=
+
+0.67
+
+Repeat for all questions.
+
+Average the scores.
+
+Final Average
+
+=
+
+Contextual Relevance Score
+
+====================================================================
+10. CONTEXTUAL RELEVANCE IS REFERENCE-FREE
+====================================================================
+
+No ideal answer is required.
+
+Only:
+
+- User Question
+- Retrieved Context
+
+Thus:
+
+Contextual Relevance is a
+Reference-Free Evaluation Metric.
+
+====================================================================
+11. IMPLEMENTING RAG TRIAD IN DEEPEVAL
+====================================================================
+
+Pipeline Evaluation uses:
+
+Input:
+Question
+
+Output:
+Generated Answer
+
+Context:
+Retrieved Context
+
+Metrics:
+
+1. Contextual Relevance
+2. Faithfulness
+3. Answer Relevance
+
+These three together form
+the RAG Triad.
+
+====================================================================
+12. PIPELINE RESULTS
+====================================================================
+
+Approximate Results Obtained:
+
+Faithfulness:
+~93%
+
+Answer Relevance:
+~86%
+
+Contextual Relevance:
+~42%
+
+Observations:
+
+Faithfulness:
+Good
+
+Answer Relevance:
+Good
+
+Contextual Relevance:
+Unexpectedly Low
+
+====================================================================
+13. THE INTERESTING PROBLEM
+====================================================================
+
+Retriever Metrics From Earlier:
+
+Recall:
+~99%
+
+Precision:
+~89%
+
+These numbers are excellent.
+
+However:
+
+Contextual Relevance:
+~42%
+
+Question:
+
+How can Retriever have:
+
+High Recall
++
+High Precision
+
+but
+
+Low Contextual Relevance?
+
+====================================================================
+14. EXPLANATION
+====================================================================
+
+Recall Measures:
+
+Out of all relevant information,
+
+How much are we retrieving?
+
+------------------------------------------------------------
+
+Precision Measures:
+
+Among retrieved chunks,
+
+How many chunks are useful?
+
+------------------------------------------------------------
+
+Contextual Relevance Measures:
+
+How much noise exists INSIDE
+the retrieved chunks?
+
+This is completely different.
+
+====================================================================
+15. NOISE INSIDE A CHUNK
+====================================================================
+
+Example:
+
+Chunk C1
+
+Contains:
+
+Useful Line 1
+Useful Line 2
+
+Noise Line 1
+Noise Line 2
+Noise Line 3
+
+------------------------------------------------------------
+
+From Precision Perspective:
+
+This chunk is useful.
+
+Because useful information exists.
+
+Precision gives credit.
+
+------------------------------------------------------------
+
+From Contextual Relevance Perspective:
+
+Only 2 out of 5 claims are useful.
+
+Contextual Relevance penalizes this.
+
+Thus:
+
+Retriever may appear strong using:
+
+- Recall
+- Precision
+
+But still have poor:
+
+- Contextual Relevance
+
+because chunks contain noisy content.
+
+====================================================================
+16. HOW TO IMPROVE CONTEXTUAL RELEVANCE
+====================================================================
+
+Possible Improvements:
+
+1. Reduce Chunk Size
+
+Smaller chunks
+=
+Less noise
+
+------------------------------------------------------------
+
+2. Adjust Overlap
+
+Optimize overlap configuration.
+
+------------------------------------------------------------
+
+3. Experiment with Chunking Strategy
+
+Different chunking techniques
+may improve relevance.
+
+====================================================================
+17. TRADE-OFF WARNING
+====================================================================
+
+Improving Contextual Relevance may reduce:
+
+- Recall
+- Precision
+
+Because evaluation metrics often have trade-offs.
+
+Optimization requires experimentation.
+
+There is no universal best configuration.
+
+====================================================================
+18. WHAT HAS BEEN COMPLETED SO FAR?
+====================================================================
+
+COMPONENT LEVEL
+
+Retriever
+
+- Recall
+- Precision
+
+Generator
+
+- Faithfulness
+- Answer Relevance
+
+------------------------------------------------------------
+
+PIPELINE LEVEL
+
+RAG Triad
+
+- Contextual Relevance
+- Faithfulness
+- Answer Relevance
+
+Pipeline-Level Evaluation completed.
+
+====================================================================
+19. NEXT STEP
+====================================================================
+
+Remaining Layer:
+
+APPLICATION-LEVEL EVALUATION
+
+Topics To Be Evaluated:
+
+- Correctness
+- Completeness
+- Style Matching
+- Safety
+- Operations
+
+Later Topics:
+
+- Regression Testing
+- Online Evaluation
+
+====================================================================
+20. FINAL TAKEAWAY
+====================================================================
+
+A complete RAG Evaluation Suite follows:
+
+LEVEL 1
+Component Evaluation
+
+Retriever
+- Recall
+- Precision
+
+Generator
+- Faithfulness
+- Answer Relevance
+
+------------------------------------------------------------
+
+LEVEL 2
+Pipeline Evaluation
+
+RAG Triad
+
+- Contextual Relevance
+- Faithfulness
+- Answer Relevance
+
+------------------------------------------------------------
+
+LEVEL 3
+Application Evaluation
+
+- Correctness
+- Completeness
+- Style
+- Safety
+- Operations
+
+------------------------------------------------------------
+
+This layered evaluation strategy helps build
+production-grade RAG systems.
+
+====================================================================
+END OF VIDEO 14 - PART 2
+RAG PIPELINE EVALUATION
+====================================================================
+
+
+https://github.com/campusx-official/rag-eval-deepeval/blob/main/evals/eval_rag_pipeline.py
+
+
+# eval_rag_pipeline.py
+from dotenv import load_dotenv
+
+from deepeval import evaluate
+from deepeval.test_case import LLMTestCase
+from deepeval.metrics import (
+    FaithfulnessMetric,
+    AnswerRelevancyMetric,
+    ContextualRelevancyMetric,
+)
+
+from src.rag_pipeline import RagPipeline
+from evals.harness import load_goldens, summarize_by_metric, print_summary
+
+load_dotenv()
+
+GOLDEN_PATH = "goldens/faithfulness_dataset.json"   # reuse the queries
+JUDGE_MODEL = "gpt-4o-mini"
+THRESHOLD = 0.7
+
+
+def run(rag):
+    # 1. LOAD queries (we only need the queries --- context comes from the pipeline now)
+    goldens = load_goldens(GOLDEN_PATH)
+
+    # 2. RUN THE INJECTED PIPELINE per query, build a test case from LIVE output
+    test_cases = []
+    for g in goldens:
+        result = rag.invoke(g["query"])          # retrieve -> rerank -> generate
+
+        test_cases.append(
+            LLMTestCase(
+                input=g["query"],
+                actual_output=result["answer"],       # what the generator produced
+                retrieval_context=result["context"],  # what the RETRIEVER returned
+            )
+        )
+
+    # 3. THE THREE TRIAD METRICS
+    metrics = [
+        ContextualRelevancyMetric(threshold=THRESHOLD, model=JUDGE_MODEL, include_reason=True),
+        FaithfulnessMetric(threshold=THRESHOLD, model=JUDGE_MODEL, include_reason=True),
+        AnswerRelevancyMetric(threshold=THRESHOLD, model=JUDGE_MODEL, include_reason=True),
+    ]
+
+    # 4. EVALUATE
+    result = evaluate(test_cases=test_cases, metrics=metrics)
+    return summarize_by_metric(result)
+
+
+def run_local():
+    """Standalone convenience: build the pipeline, then run."""
+    return run(RagPipeline())
+
+
+if __name__ == "__main__":
+    print_summary("rag_pipeline", run_local())
