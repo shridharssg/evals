@@ -822,36 +822,32 @@ Stores:
 Used during baseline vs candidate comparison.
 
 ======================================================================
-MOST IMPORTANT INTERVIEW QUESTIONS (MUST PREPARE)
-======================================================================
 
-1. What are LLM Evaluations?
-2. Model Evaluation vs Application Evaluation?
-3. What is a Golden Dataset?
-4. What is LLM-as-a-Judge?
-5. What is Recall?
-6. What is Precision?
-7. Recall vs Precision?
-8. What is Faithfulness?
-9. Faithfulness vs Correctness?
-10. What is Answer Relevance?
-11. What is RAG Triad?
-12. Context Relevance vs Precision?
-13. What is G-Eval?
-14. Two innovations of G-Eval?
-15. What is Probability Weighted Scoring?
-16. What is Toxicity?
-17. What is Leakage?
-18. What is Scope Adherence?
-19. What are Guardrails?
-20. Prompt Guardrail vs Output Guardrail?
-21. What is Latency?
-22. P50 vs P95 vs P99?
-23. What is TTFT?
-24. What is Reliability?
-25. What is Regression Testing?
-26. What is Noise Threshold?
-27. What is Metric Registry?
-28. How would you evaluate a RAG chatbot end-to-end?
+DEEPEVAL FUNDAMENTALS
+
+Three Core Concepts:
+
+A. LLMTestCase
+Represents one row from golden dataset.
+
+Contains:
+- Input Question
+- Expected Output
+- Retrieved Context
+
+B. Metric
+Examples:
+- Contextual Recall
+- Contextual Precision
+- Answer Relevance
+- Faithfulness
+
+Parameters:
+- Judge Model
+- Threshold
+- Include Reason
+
+C. Evaluate()
+Runs metrics against test cases.
 
 ====================================================================
